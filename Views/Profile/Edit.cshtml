@@ -1,0 +1,227 @@
+﻿@model EXE.Models.ApplicationUser
+@{
+    ViewData["Title"] = "Chỉnh sửa thông tin";
+    if (User.Identity != null && User.Identity.IsAuthenticated)
+    {
+        Layout = (User.IsInRole("Admin") || User.IsInRole("Staff"))
+        ? "~/Views/Shared/DashboardLayout.cshtml"
+        : "~/Views/Shared/ProductLayout.cshtml";
+    }
+    else
+    {
+        Layout = "~/Views/Shared/ProductLayout.cshtml";
+    }
+}
+
+<div class="container mt-4">
+    <!-- Header với theme nông sản -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-success">
+                <div class="card-header bg-success text-white text-center">
+                    <h2><i class="fas fa-edit me-2"></i>Chỉnh sửa thông tin cá nhân</h2>
+                    <p class="mb-0">Cập nhật thông tin để có trải nghiệm tốt nhất với nông sản</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card border-success shadow">
+                <div class="card-header bg-light">
+                    <h5 class="card-title mb-0 text-success">
+                        <i class="fas fa-user-edit me-2"></i>Thông tin chi tiết
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Edit" method="post">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="FirstName" class="form-label fw-bold text-success">
+                                    <i class="fas fa-signature me-2"></i>Họ
+                                </label>
+                                <input asp-for="FirstName" class="form-control border-success" placeholder="Nhập họ của bạn" />
+                                <span asp-validation-for="FirstName" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="LastName" class="form-label fw-bold text-success">
+                                    <i class="fas fa-signature me-2"></i>Tên
+                                </label>
+                                <input asp-for="LastName" class="form-control border-success" placeholder="Nhập tên của bạn" />
+                                <span asp-validation-for="LastName" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-12 mb-3">
+                                <label asp-for="Email" class="form-label fw-bold text-success">
+                                    <i class="fas fa-envelope me-2"></i>Email
+                                </label>
+                                <input asp-for="Email" class="form-control border-success" type="email" placeholder="email@example.com" />
+                                <span asp-validation-for="Email" class="text-danger small"></span>
+                                <div class="form-text">
+                                    <i class="fas fa-info-circle text-info me-1"></i>
+                                    Email dùng để nhận thông báo về đơn hàng và khuyến mãi nông sản
+                                </div>
+                            </div>
+
+                            <div class="col-md-12 mb-3">
+                                <label asp-for="PhoneNumber" class="form-label fw-bold text-success">
+                                    <i class="fas fa-phone me-2"></i>Số điện thoại
+                                </label>
+                                <input asp-for="PhoneNumber" class="form-control border-success" type="tel" placeholder="0912345678" />
+                                <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
+                                <div class="form-text">
+                                    <i class="fas fa-info-circle text-info me-1"></i>
+                                    Số điện thoại để liên hệ giao hàng nông sản
+                                </div>
+                            </div>
+
+                            <div class="col-md-12 mb-3">
+                                <label class="form-label fw-bold text-muted">
+                                    <i class="fas fa-user me-2"></i>Tên đăng nhập
+                                </label>
+                                <input value="@Model.UserName" class="form-control" readonly />
+                                <div class="form-text">
+                                    <i class="fas fa-lock text-warning me-1"></i>
+                                    Tên đăng nhập không thể thay đổi
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Buttons -->
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <div class="d-flex justify-content-between">
+                                    <a href="@Url.Action("Index")" class="btn btn-outline-secondary">
+                                        <i class="fas fa-arrow-left me-2"></i>Quay lại
+                                    </a>
+                                    <button type="submit" class="btn btn-success">
+                                        <i class="fas fa-save me-2"></i>Lưu thay đổi
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar với tips -->
+        <div class="col-md-4">
+            <div class="card border-info shadow-sm">
+                <div class="card-header bg-info text-white">
+                    <h6 class="card-title mb-0">
+                        <i class="fas fa-lightbulb me-2"></i>Mẹo hữu ích
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <div class="d-flex align-items-center mb-2">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            <strong>Thông tin chính xác</strong>
+                        </div>
+                        <p class="small text-muted">
+                            Cập nhật đầy đủ thông tin để nhận được dịch vụ tốt nhất
+                        </p>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="d-flex align-items-center mb-2">
+                            <i class="fas fa-shield-alt text-warning me-2"></i>
+                            <strong>Bảo mật thông tin</strong>
+                        </div>
+                        <p class="small text-muted">
+                            Thông tin của bạn được bảo mật tuyệt đối
+                        </p>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="d-flex align-items-center mb-2">
+                            <i class="fas fa-truck text-primary me-2"></i>
+                            <strong>Giao hàng nhanh</strong>
+                        </div>
+                        <p class="small text-muted">
+                            Số điện thoại chính xác giúp giao hàng nông sản nhanh chóng
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Nông sản nổi bật -->
+            <div class="card border-success shadow-sm mt-3">
+                <div class="card-header bg-success text-white">
+                    <h6 class="card-title mb-0">
+                        <i class="fas fa-star me-2"></i>Nông sản nổi bật
+                    </h6>
+                </div>
+                <div class="card-body p-2">
+                    <div class="text-center">
+                        <i class="fas fa-apple-alt text-danger fa-2x mb-2"></i>
+                        <p class="small mb-1"><strong>Táo Envy</strong></p>
+                        <p class="small text-muted">Tươi ngon từ Đà Lạt</p>
+
+                        <i class="fas fa-carrot text-warning fa-2x mb-2 mt-2"></i>
+                        <p class="small mb-1"><strong>Cà rốt organic</strong></p>
+                        <p class="small text-muted">100% tự nhiên</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Custom CSS -->
+<style>
+    .form-control:focus {
+        border-color: #28a745;
+        box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+    }
+
+    .border-success {
+        border-color: #28a745 !important;
+    }
+
+    .card {
+        transition: transform 0.2s ease-in-out;
+    }
+
+        .card:hover {
+            transform: translateY(-2px);
+        }
+
+    .btn-success {
+        background: linear-gradient(135deg, #28a745, #20c997);
+        border: none;
+        transition: all 0.3s ease;
+    }
+
+        .btn-success:hover {
+            background: linear-gradient(135deg, #218838, #1e9ecb);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+    .bg-success {
+        background: linear-gradient(135deg, #28a745, #20c997) !important;
+    }
+
+    .bg-info {
+        background: linear-gradient(135deg, #17a2b8, #6f42c1) !important;
+    }
+</style>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script src="https://kit.fontawesome.com/your-fontawesome-kit.js"></script>
+    @{
+        Layout = "~/Views/Shared/ProductLayout.cshtml";
+    }    <!-- home -->
+    @Html.Partial("~/Views/chatbox.cshtml")
+}

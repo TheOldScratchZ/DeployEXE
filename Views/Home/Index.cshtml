@@ -1,0 +1,466 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+<body>
+    @{
+        if (User.Identity != null && User.Identity.IsAuthenticated)
+        {
+            Layout = (User.IsInRole("Admin") || User.IsInRole("Staff"))
+            ? "~/Views/Shared/DashboardLayout.cshtml"
+            : "~/Views/Shared/ProductLayout.cshtml";
+        }
+        else
+        {
+            Layout = "~/Views/Shared/ProductLayout.cshtml";
+        }
+    }    <!-- home -->
+    @Html.Partial("~/Views/chatbox.cshtml")
+
+    <div id="mainCarousel" class="position-relative overflow-hidden" style="height: 700px;">
+        <div class="custom-carousel">
+            <img src="https://greenma.net/wp-content/uploads/2024/09/z5836020444109_29c4d3b880397e01b20cc7da2a2eee6b-e1726472430838.jpg" class="carousel-slide active" alt="Slide 1">
+            <img src="https://greenma.net/wp-content/uploads/2024/09/banner-2-edited-001.jpg" class="carousel-slide" alt="Slide 2">
+            <img src="/img/banner/banner3.jpg" class="carousel-slide" alt="Slide 3">
+        </div>
+
+        <!-- Slogan overlay -->
+        <div class="position-absolute top-50 start-50 translate-middle text-center z-3">
+            <h1 class="text-white fw-bold display-3">
+                FARM<span style="font-size: 1.5em; color: aliceblue;">2</span>YOU
+            </h1>
+            <span class="text-white fs-4 fst-italic">Phát triển Nông nghiệp Xanh & Bền Vững</span>
+        </div>
+
+        <!-- Controls -->
+        <button id="prevBtn" class="carousel-control-prev" style="z-index: 5;">
+            <span class="carousel-control-prev-icon"></span>
+        </button>
+        <button id="nextBtn" class="carousel-control-next" style="z-index: 5;">
+            <span class="carousel-control-next-icon"></span>
+        </button>
+    </div>
+    <div>
+        <!-- ABOUT US SECTION -->
+        <section class="bg-section-1">
+            <div class="container-fluid">
+                <div class="row align-items-center" style="padding:3rem 5rem 3rem 5rem">
+                    <div class="col-md-12">
+                        <h3 class="fw-bold">CÂU CHUYỆN CỦA CHÚNG TÔI</h3>
+                        <h4 class="text-success">Câu chuyện thật</h4>
+                        <p>Chúng tôi là những người trẻ đầy nhiệt huyết với mong muốn đưa các sản phẩm nông sản sạch, 
+                            chất lượng cao từ quê hương đến gần hơn với người tiêu dùng. Từ những lá trà búp ổi thơm dịu, đến bột sắn dây nguyên chất mát lành – mỗi sản phẩm trên website đều được tuyển chọn kỹ lưỡng, đến từ những vùng quê trù phú và canh tác theo hướng tự nhiên.</p><br>
+                        <p>
+                            Chúng tôi tin rằng: sự tử tế bắt đầu từ những điều nhỏ nhất – như một gói trà sạch hay một túi bột nguyên chất, được đóng gói cẩn thận và trao tận tay bạn.
+                        </p><br>
+                        <p>
+                            Không chỉ là nơi mua sắm, website này còn là cầu nối giữa người nông dân và người tiêu dùng, giúp lan toả giá trị nông sản Việt, nâng tầm những sản phẩm tưởng chừng bình dị trở thành lựa chọn đáng tin cậy cho mỗi gia đình.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- WHAT WE OFFER SECTION -->
+        <section id="section3" class="bg-section-2">
+            <img class="icon1" src="https://greenma.net/wp-content/themes/Greentech/assets/img/icon2.png" alt="icon">
+            <img class="icon2" src="https://greenma.net/wp-content/themes/Greentech/assets/img/icon3.png" alt="icon">
+            <div class="container">
+                <div class="row group-ef lazy-hidden" style="padding:0 10rem 0 10rem">
+                    <div class="col-12 efch-2 ef-img-t">
+                        <div class="content">
+                            <h3 style="color: #ffffff;font-weight: bold" >CHÚNG TÔI SẼ LÀM GÌ</h3>
+                            <h2 style="color: #ffffff;font-weight: bold">Điều chúng tôi mang lại</h2>
+                            <p style="color: #ffffff">Những điều mà bạn quan tâm nhất, khi đến với FARM2U</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="row group-ef lazy-hidden" style="padding:5rem 0 5rem 0">
+                    <div class="col-12 efch-2 ef-img-t">
+                        <style>  
+                            .icon-item img {
+                                height: 250px;
+                                width: 100%;
+                                object-fit: cover;
+                                border-radius: 8px;
+                                display: block;
+                            }
+                           .card2 {  
+                               display: flex;  
+                               flex-direction: column;  
+                               justify-content: space-between;  
+                               height: 100%;  
+                           }  
+
+                           .row.group-ef.lazy-hidden {  
+                               display: flex;  
+                           }  
+
+                           .row.group-ef.lazy-hidden .col-md-4 {  
+                               display: flex;  
+                               flex-direction: column;  
+                           }
+
+                            .card-body {
+                                text-align: center;
+                                padding: 1.5rem;
+                            }
+
+                            .card-title {
+                                margin-top: 1rem;
+                                margin-bottom: 0.5rem;
+                            }
+
+                            .card-text {
+                                margin-bottom: 0;
+                            }
+                        </style>  
+
+                        <div class="row group-ef lazy-hidden">  
+                           <div class="col-12 col-md-4 margin-b-30 efch-2 ef-img-t">  
+                               <div class="card2 bg-white rounded shadow-sm">    
+                                   <div class="card-body">  
+                                       <div class="icon-item">
+                                            <img class="img-fluid w-100" src="https://thacogroup.vn/storage/linh-vuc-hoat-dong/thagrico/2025/banner-dau-trang-1920x860px.jpg" alt="Hình ảnh nông sản">
+                                        </div>  
+                                       <h4 class="card-title" style="font-weight: bold">Sản phẩm nguyên chất, an toàn</h4>  
+                                       <p class="card-text">  
+                                           Chúng tôi cam kết chỉ cung cấp những sản phẩm nông sản sạch, không chất bảo quản, không hương liệu nhân tạo – giữ trọn hương vị và giá trị tự nhiên.  
+                                       </p>  
+                                   </div>  
+                               </div>  
+                           </div>  
+                           <div class="col-12 col-md-4 margin-b-30 efch-2 ef-img-t">  
+                               <div class="card2 bg-white rounded shadow-sm">  
+                                   <div class="card-body">  
+                                       <div class="icon-item">
+                                            <img class="img-fluid w-100" src="https://image3.luatvietnam.vn/uploaded/images/original/2024/08/02/mua-sam-xanh-la-gi_0208085048.png" alt="Hình ảnh nông sản">
+                                        </div>
+                                        <h4 class="card-title" style="font-weight: bold">Trải nghiệm mua sắm tiện lợi, tận tâm</h4>
+                                        <p class="card-text">  
+                                           Từ khâu đặt hàng đến giao hàng, chúng tôi luôn cố gắng mang lại sự nhanh chóng, rõ ràng và hỗ trợ khách hàng một cách tận tình nhất.  
+                                       </p>  
+                                   </div>  
+                               </div>  
+                           </div>  
+                           <div class="col-12 col-md-4 margin-b-30 efch-2 ef-img-t">  
+                               <div class="card2 bg-white rounded shadow-sm">  
+                                   <div class="card-body">  
+                                       <div class="icon-item">
+                                            <img class="img-fluid w-100" src="https://images.baodantoc.vn/uploads/2024/Thang-12/Ngay-27/Minh-Quy/5.jpg" alt="Hình ảnh nông sản">
+                                        </div>
+                                        <h4 class="card-title" style="font-weight: bold">Kết nối trực tiếp với người làm nông</h4>
+                                        <p class="card-text">  
+                                           Mỗi sản phẩm bạn nhận được đều đến từ những người nông dân chân thật, tâm huyết. Khi mua hàng, bạn cũng đang ủng hộ một nền nông nghiệp bền vững và công bằng hơn.  
+                                       </p>  
+                                   </div>  
+                               </div>  
+                           </div>  
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- WHY CHOOSE US SECTION -->
+        <section id="section4" class="bg-section-4">
+            <style>
+                .images-box {
+                    height: 100%;
+                    max-height: 400px;
+                    overflow: hidden;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+
+                    .images-box img {
+                        height: 100%;
+                        width: auto;
+                        object-fit: cover;
+                        border-radius: 10px;
+                        display: block;
+                    }
+
+                .content {
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
+                    height: 100%;
+                    padding: 1rem;
+                    font-family: "Times New Roman", Times, serif;
+                }
+
+                    .content h2, .content h3, .content p {
+                        text-align: left;
+                    }
+            </style>
+            <div class="container">
+                <div class="row group-ef lazy-hidden" style="padding:5rem 0 10rem 0">
+                    <div class="col-12 col-md-5 efch-2 ef-img-t">
+                        <div class="images-box">
+                            <img src="https://media.hasaki.vn/hsk/bot-san-day.jpg"
+                                 alt="Bột sắn dây"
+                                 class="img-fluid">
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-7 efch-3 ef-img-t">
+                        <div class="content">
+                            <h3 style="color: #c7d80e">TẠI SAO CHỌN CHÚNG TÔI</h3>
+                            <h2>Sự khác biệt của FARM<span style="color:#13863d">2</span>U </h2>
+                            <div class="content-item">
+                                <div class="text-item-title">
+                                    <h3>Nguồn nguyên liệu sạch</h3>
+                                    <div class="toggle-content">
+                                        <p>
+                                            Chúng tôi làm việc trực tiếp với nông dân và các hợp tác xã uy tín, chọn lọc nguyên liệu từ vùng trồng đạt chuẩn – đảm bảo từng gói sản phẩm đều sạch, nguyên chất và giàu giá trị dinh dưỡng.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="content-item">
+                                <div class="text-item-title">
+                                    <h3>Giá trị thật, không phô trương</h3>
+                                    <div class="toggle-content">
+                                        <p>
+                                            Không chạy theo hình thức hay quảng cáo ồn ào, chúng tôi tập trung vào trải nghiệm thật và giá trị thật cho người dùng – từ hương vị tự nhiên đến sự an tâm khi sử dụng.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- BLOG SECTION -->
+        <section>
+            <div class="container-fluid">
+                <div class="row" style="padding:5rem 5rem 5rem 5rem">
+                    <!-- Big blog post -->
+                    <div class="col-md-6">
+                        <div class="card border-0 bg-white shadow">
+                            <img src="https://t.ex-cdn.com/nongnghiepmoitruong.vn/608w/files/benlc/2025/05/20/3632-anh-2-101413_318.jpg" class="card-img-top" alt="Big Blog Image" style="height: 300px; object-fit: cover;">
+                            <div class="card-body">
+                                <h3 class="fw-bold">Tài nguyên từ rơm rạ</h3>
+                                <p class="text-success">Organic</p>
+                                <p>Rơm rạ không còn là phụ phẩm bỏ đi mà đang trở thành nguồn tài nguyên xanh giúp nông dân ĐBSCL giảm phát thải và phát triển nông nghiệp tuần hoàn, bền vững.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- small blog posts -->
+                    <div class="col-md-6 d-flex flex-column gap-3">
+                        <div class="d-flex border rounded overflow-hidden">
+                            <img src="https://cdn2.tuoitre.vn/thumb_w/730/471584752817336320/2024/5/22/base64-17163616223411649545780.jpeg" alt="Blog 1" style="width: 120px; object-fit: cover;">
+                            <div class="p-2">
+                                <h6 class="fw-bold mb-1">Lão nông biến mo cau thành phân hữu cơ</h6>
+                                <p class="text-success mb-1">Organic</p>
+                                <p class="mb-0" style="font-size: 13px;">Ông Thái bỏ cả trăm triệu làm nhà xưởng ủ phân hữu cơ từ mo cau, tàu dừa phục vụ trồng trọt.</p>
+                            </div>
+                        </div>
+
+                        <div class="d-flex border rounded overflow-hidden">
+                            <img src="/img/products/blog3.jpg" alt="Blog 2" style="width: 120px; object-fit: cover;">
+                            <div class="p-2">
+                                <h6 class="fw-bold mb-1">Trang trại hữu cơ dưới chân núi Langbiang</h6>
+                                <p class="text-success mb-1">Organic</p>
+                                <p class="mb-0" style="font-size: 13px;">Trang trại rau sạch, dược liệu hữu cơ phát triển nhờ địa hình và khí hậu đặc biệt của núi rừng Tây Nguyên.</p>
+                            </div>
+                        </div>
+
+                        <div class="d-flex border rounded overflow-hidden">
+                            <img src="/img/products/blog4.jpg" alt="Blog 3" style="width: 120px; object-fit: cover;">
+                            <div class="p-2">
+                                <h6 class="fw-bold mb-1">Hiện thực ước mơ xây dựng vùng chè sạch, hữu cơ</h6>
+                                <p class="text-success mb-1">Organic</p>
+                                <p class="mb-0" style="font-size: 13px;"> Chị Bùi Thị Mai đang từng bước hiện thực ước mơ xây dựng vùng chè hữu cơ ở Hoàng Nông, tạo ra sản phẩm trà chất lượng cao, đáp ứng thị trường khó tính. </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- BEST SELLING PRODUCT SECTION -->
+        <section>
+            <div class="container-fluid">
+                <div class="row align-items-center">
+                    <div class="col-md-5" style="padding:5rem 0 10rem 10rem">
+                        <img src="https://product.hstatic.net/200000534989/product/tra_oi_hong_47d6c403599a4c9b970a7918f7233e89.jpg" alt="Best Seller" class="img-fluid rounded" style="object-fit: cover; height: 100%; width: 100%;">
+                    </div>
+                    <div class="col-md-1"></div>
+                    <div class="col-md-6 bg-section-3" style="padding:5rem 10rem 10rem 5rem">
+                        <h2 class="fw-bold">Trà búp ổi FARM2U</h2>
+                        <h4 class="text-success">Sản phẩm nổi bật</h4>
+                        <p>Búp ổi có những đặc tính nổi bật về y học mà không phải ai cũng biết. Trà búp ổi là một trong các loại trà thảo mộc đem đến rất nhiều công dụng khác nhau. Do vậy, loại trà này được nhiều người đặc biệt yêu thích, trong đó có bệnh nhân tiểu đường.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PRODUCT CAROUSEL SECTION -->
+        <section class="bg-section-4">
+            <div class="container-fluid">
+                <div style="padding:5rem 10rem 10rem 10rem">
+                    <h4 class="fw-bold mb-3">Sản phẩm nổi bật</h4>
+                    <div class="d-flex overflow-auto gap-3 pb-2">
+                        <!-- Repeat this card for each product -->
+                        <div class="card" style="min-width: 220px;">
+                            <img src="https://t.ex-cdn.com/nongnghiepmoitruong.vn/608w/files/benlc/2025/05/20/3632-anh-2-101413_318.jpg" class="card-img-top" alt="Product 1" style="height: 140px; object-fit: cover;">
+                            <div class="card-body">
+                                <h6 class="fw-bold">Phân vi sinh hữu cơ</h6>
+                                <p class="text-success mb-0">Organic</p>
+                            </div>
+                        </div>
+
+                        <div class="card" style="min-width: 220px;">
+                            <img src="/img/products/blog4.jpg" class="card-img-top" alt="Product 2" style="height: 140px; object-fit: cover;">
+                            <div class="card-body">
+                                <h6 class="fw-bold">Trà thảo dược sạch</h6>
+                                <p class="text-success mb-0">Organic</p>
+                            </div>
+                        </div>
+
+                        <div class="card" style="min-width: 220px;">
+                            <img src="/img/products/product1.jpg" class="card-img-top" alt="Product 3" style="height: 140px; object-fit: cover;">
+                            <div class="card-body">
+                                <h6 class="fw-bold">Sản phẩm OCOP 5 sao</h6>
+                                <p class="text-primary mb-0">Nông sản Việt</p>
+                            </div>
+                        </div>
+
+                        <div class="card" style="min-width: 220px;">
+                            <img src="/img/products/blog3.jpg" class="card-img-top" alt="Product 2" style="height: 140px; object-fit: cover;">
+                            <div class="card-body">
+                                <h6 class="fw-bold">Trà thảo dược sạch</h6>
+                                <p class="text-success mb-0">Organic</p>
+                            </div>
+                        </div>
+
+                        <div class="card" style="min-width: 220px;">
+                            <img src="https://t.ex-cdn.com/nongnghiepmoitruong.vn/608w/files/benlc/2025/05/20/3632-anh-2-101413_318.jpg" class="card-img-top" alt="Product 2" style="height: 140px; object-fit: cover;">
+                            <div class="card-body">
+                                <h6 class="fw-bold">Trà thảo dược sạch</h6>
+                                <p class="text-success mb-0">Organic</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+    <style>
+
+        body {
+            font-family: 'Roboto', sans-serif;
+        }
+
+        h1 {
+            font-size: 4rem;
+        }
+
+        h2 {
+            font-size: 3rem;
+        }
+
+        h3 {
+            font-size: 2.5rem;
+        }
+
+        h4 {
+            font-size: 2rem;
+        }
+
+        h5 {
+            font-size: 1.25rem;
+        }
+
+        h6 {
+            font-size: 1rem;
+        }
+
+        p {
+            font-size: 1.25rem;
+            line-height: 1.5;
+        }
+
+        .custom-carousel {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        .carousel-slide {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: brightness(72%);
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+            z-index: 1;
+        }
+
+            .carousel-slide.active {
+                opacity: 1;
+                z-index: 2;
+            }
+        .bg-section-1 {
+            background-color: #f0f9f0;
+        }
+
+        .bg-section-2 {
+            background-color: #0e3c00;
+        }
+
+        .bg-section-3 {
+            background-color: #eab676;
+        }
+
+        .bg-section-4 {
+            background-color: #eeeee4;
+        }
+    </style>
+    <script>
+        let slides = document.querySelectorAll('.carousel-slide');
+        let currentSlide = 0;
+        let intervalTime = 3000;
+        let interval = setInterval(nextSlide, intervalTime);
+
+        function showSlide(index) {
+            slides.forEach((slide, i) => {
+                slide.classList.remove('active');
+                if (i === index) {
+                    slide.classList.add('active');
+                }
+            });
+        }
+
+        function nextSlide() {
+            currentSlide = (currentSlide + 1) % slides.length;
+            showSlide(currentSlide);
+        }
+
+        function prevSlide() {
+            currentSlide = (currentSlide - 1 + slides.length) % slides.length;
+            showSlide(currentSlide);
+        }
+
+        // Manual navigation
+        document.getElementById('nextBtn').addEventListener('click', () => {
+            nextSlide();
+            resetInterval();
+        });
+        document.getElementById('prevBtn').addEventListener('click', () => {
+            prevSlide();
+            resetInterval();
+        });
+
+        // Restart interval on manual nav
+        function resetInterval() {
+            clearInterval(interval);
+            interval = setInterval(nextSlide, intervalTime);
+        }
+    </script>
+</body>

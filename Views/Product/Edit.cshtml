@@ -1,0 +1,82 @@
+﻿@model EXE.Models.Product
+
+@{
+    Layout = "~/Views/Shared/DashboardLayout.cshtml";
+}
+<div class="container py-4">
+    <h2 class="mb-4">Chỉnh sửa sản phẩm</h2>
+
+    <form asp-action="Edit" asp-controller="Product" method="post" enctype="multipart/form-data">
+        <input type="hidden" asp-for="Id" />
+
+        <div class="mb-3">
+            <label asp-for="Name" class="form-label">Tên sản phẩm</label>
+            <input asp-for="Name" class="form-control" />
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Description" class="form-label">Mô tả</label>
+            <textarea asp-for="Description" class="form-control"></textarea>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Price" class="form-label">Giá</label>
+            <input asp-for="Price" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Stock" class="form-label">Tồn kho</label>
+            <input asp-for="Stock" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="RegionId" class="form-label">Khu vực</label>
+            <select asp-for="RegionId" asp-items="ViewBag.Regions" class="form-select"></select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Hình ảnh hiện tại:</label>
+            <div class="d-flex gap-2 flex-wrap">
+                @foreach (var img in Model.ImageUrl)
+                {
+                    <img src="@img" alt="Ảnh" class="img-thumbnail" style="width: 80px; height: 80px; object-fit: cover;" />
+                }
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Thêm hình ảnh mới</label>
+            <input type="file" name="NewImages" id="imageInput" class="form-control" multiple onchange="previewImages(event)" />
+            <div id="imagePreview" class="d-flex gap-2 mt-2 flex-wrap"></div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+        <a href="/product/shop" class="btn btn-secondary">Quay lại</a>
+    </form>
+</div>
+@section Scripts {
+    <script>
+        function previewImages(event) {
+            const files = event.target.files;
+            const preview = document.getElementById('imagePreview');
+            preview.innerHTML = "";
+
+            Array.from(files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const img = document.createElement("img");
+                    img.src = e.target.result;
+                    img.className = "img-thumbnail";
+                    img.style.width = "100px";
+                    img.style.height = "100px";
+                    img.style.objectFit = "cover";
+                    preview.appendChild(img);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+    </script>
+    @Html.Partial("~/Views/chatbox.cshtml")
+
+}

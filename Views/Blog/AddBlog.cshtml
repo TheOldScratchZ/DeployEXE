@@ -1,0 +1,496 @@
+﻿@model EXE.Models.Blog
+@using EXE.Models
+@{
+    ViewData["Title"] = "Add Blog";    
+    var regions = ViewBag.Regions as List<Region>;
+}
+
+@{
+    if (User.Identity != null && User.Identity.IsAuthenticated)
+    {
+        Layout = (User.IsInRole("Admin") || User.IsInRole("Staff"))
+        ? "~/Views/Shared/DashboardLayout.cshtml"
+        : "~/Views/Shared/ProductLayout.cshtml";
+    }
+    else
+    {
+        Layout = "~/Views/Shared/ProductLayout.cshtml";
+    }
+}
+<html>
+<body>
+    <form id="blogForm" asp-action="AddBlog" method="post" enctype="multipart/form-data">
+        <div class="form-group">
+            <label>Title</label>
+            <input asp-for="Title" class="form-control" />
+            <span asp-validation-for="Title" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label>Region</label>
+            <select asp-for="RegionId" class="form-control">
+                <option value="">-- Select Region --</option>
+                @foreach (var region in regions)
+                {
+                    <option value="@region.Id">@region.Name</option>
+                }
+            </select>
+            <span asp-validation-for="RegionId" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label>Content Type</label>
+            <input asp-for="ContentType" class="form-control text-uppercase" oninput="this.value = this.value.toUpperCase()" />
+            <span asp-validation-for="ContentType" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label>Tags</label>
+            <input asp-for="Tags" id="tagsInput" class="form-control" placeholder="Enter tags separated by commas (e.g., travel, food, culture)" />
+            <span asp-validation-for="Tags" class="text-danger"></span>
+            <small class="form-text text-muted">Optional. Use commas to separate multiple tags. Tags will automatically get # prefix.</small>
+            <div id="tagsPreview" class="mt-2" style="display: none;">
+                <strong>Preview:</strong> <span id="tagsPreviewText"></span>
+            </div>
+        </div>
+
+        @Html.Partial("~/Views/chatbox.cshtml")
+
+        <div class="form-group">
+            <label>Thumbnail Images</label>
+            <input type="file" id="thumbnails" multiple accept="image/*" class="form-control" />
+            <button type="button" id="addMoreThumbnails" class="btn btn-secondary btn-sm mt-2">Add More Images</button>
+            <div id="thumbnailPreview" class="mt-2"></div>
+            <small class="form-text text-muted">You can add multiple images. Click "Add More Images" to add additional images without removing existing ones.</small>
+
+            <!-- Hidden container để lưu tất cả files -->
+            <div id="hiddenFileInputs" style="display: none;"></div>
+        </div>
+
+        <div class="form-group">
+            <label>Content</label>
+            <textarea asp-for="Content" id="editor" rows="10"></textarea>
+            <span asp-validation-for="Content" class="text-danger"></span>
+            <small class="form-text text-muted">You can upload images directly in the content editor</small>
+        </div>
+
+        <div class="form-group">
+            <label>Link</label>
+            <input asp-for="Link" class="form-control" placeholder="Optional external link" />
+            <span asp-validation-for="Link" class="text-danger"></span>
+            <small class="form-text text-muted">Optional. You can add a related external link.</small>
+        </div>
+
+        <!-- Hidden field for Star rating - auto set to 0 -->
+        <input asp-for="Star" type="hidden" value="0" />
+
+        <!-- Hidden field để lưu tags đã format -->
+        <input type="hidden" id="formattedTags" name="FormattedTags" />
+
+        <button type="submit" class="btn btn-primary mt-3">Submit</button>
+        <a href="@Url.Action("Index", "Blog")" class="btn btn-secondary mt-3">Cancel</a>
+    </form>
+
+    <!-- Move scripts directly into the view body -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.ckeditor.com/ckeditor5/38.1.1/classic/ckeditor.js"></script>
+
+    <script>
+        let editor;
+
+        // Khởi tạo CKEditor với image upload
+        ClassicEditor
+            .create(document.querySelector('#editor'), {
+                ckfinder: {
+                    uploadUrl: '@Url.Action("UploadImage", "Blog")'
+                },
+                toolbar: {
+                    items: [
+                        'heading', '|',
+                        'bold', 'italic', 'link', '|',
+                        'bulletedList', 'numberedList', '|',
+                        'outdent', 'indent', '|',
+                        'imageUpload', 'blockQuote', 'insertTable', '|',
+                        'undo', 'redo'
+                    ]
+                },
+                image: {
+                    toolbar: [
+                        'imageStyle:inline',
+                        'imageStyle:block',
+                        'imageStyle:side',
+                        '|',
+                        'toggleImageCaption',
+                        'imageTextAlternative'
+                    ]
+                }
+            })
+            .then(newEditor => {
+                editor = newEditor;
+            })
+            .catch(error => {
+                console.error('CKEditor initialization error:', error);
+            });
+
+        // Function để format tags tự động thêm dấu #
+        function formatTags(tagsString) {
+            if (!tagsString || tagsString.trim() === '') {
+                return '';
+            }
+
+            // Tách tags bằng dấu phẩy
+            const tags = tagsString.split(',')
+                .map(tag => tag.trim()) // Loại bỏ khoảng trắng thừa
+                .filter(tag => tag !== '') // Loại bỏ tag rỗng
+                .map(tag => {
+                    // Nếu tag chưa có dấu #, thêm vào
+                    return tag.startsWith('#') ? tag : '#' + tag;
+                });
+
+            return tags.join(' '); // Nối các tag bằng khoảng trắng
+        }
+
+        // Function để hiển thị preview tags
+        function updateTagsPreview() {
+            const tagsInput = document.getElementById('tagsInput');
+            const tagsPreview = document.getElementById('tagsPreview');
+            const tagsPreviewText = document.getElementById('tagsPreviewText');
+
+            const inputValue = tagsInput.value.trim();
+
+            if (inputValue === '') {
+                tagsPreview.style.display = 'none';
+                return;
+            }
+
+            const formattedTags = formatTags(inputValue);
+            if (formattedTags) {
+                tagsPreviewText.textContent = formattedTags;
+                tagsPreview.style.display = 'block';
+            } else {
+                tagsPreview.style.display = 'none';
+            }
+        }
+
+        // Xử lý input event cho tags
+        document.getElementById('tagsInput').addEventListener('input', function() {
+            updateTagsPreview();
+        });
+
+        // Array để lưu tất cả files đã chọn
+        let selectedFiles = [];
+        let fileCounter = 0;
+
+        // Function để tạo preview container
+        function createPreviewContainer() {
+            const existingContainer = document.getElementById('previewContainer');
+            if (existingContainer) {
+                return existingContainer;
+            }
+
+            const previewContainer = document.createElement('div');
+            previewContainer.id = 'previewContainer';
+            previewContainer.style.display = 'flex';
+            previewContainer.style.flexWrap = 'wrap';
+            previewContainer.style.gap = '10px';
+            previewContainer.style.marginTop = '10px';
+
+            return previewContainer;
+        }
+
+        // Function để update file count
+        function updateFileCount() {
+            const existingCount = document.getElementById('fileCount');
+            if (existingCount) {
+                existingCount.remove();
+            }
+
+            if (selectedFiles.length > 0) {
+                const fileCount = document.createElement('div');
+                fileCount.id = 'fileCount';
+                fileCount.textContent = `Total selected: ${selectedFiles.length} file(s)`;
+                fileCount.style.marginTop = '10px';
+                fileCount.style.fontWeight = 'bold';
+                fileCount.style.color = '#28a745';
+                document.getElementById("thumbnailPreview").appendChild(fileCount);
+            }
+        }
+
+        // Function để tạo hidden input cho file
+        function createHiddenFileInput(file, uniqueId) {
+            const hiddenContainer = document.getElementById('hiddenFileInputs');
+            const hiddenInput = document.createElement('input');
+            hiddenInput.type = 'file';
+            hiddenInput.name = 'thumbnails';
+            hiddenInput.style.display = 'none';
+            hiddenInput.id = `hiddenFile_${uniqueId}`;
+
+            // Tạo DataTransfer để set file cho input
+            const dt = new DataTransfer();
+            dt.items.add(file);
+            hiddenInput.files = dt.files;
+
+            hiddenContainer.appendChild(hiddenInput);
+            return uniqueId;
+        }
+
+        // Function để add file vào collection
+        function addFilesToCollection(files) {
+            Array.from(files).forEach(file => {
+                if (file.type.startsWith('image/')) {
+                    // Check duplicate
+                    const isDuplicate = selectedFiles.some(existingFile =>
+                        existingFile.name === file.name &&
+                        existingFile.size === file.size &&
+                        existingFile.lastModified === file.lastModified
+                    );
+
+                    if (!isDuplicate) {
+                        const uniqueId = ++fileCounter;
+                        selectedFiles.push({
+                            file: file,
+                            id: uniqueId
+                        });
+
+                        // Tạo hidden input
+                        createHiddenFileInput(file, uniqueId);
+
+                        // Tạo preview
+                        createImagePreview(file, uniqueId);
+                    }
+                }
+            });
+
+            updateFileCount();
+        }
+
+        // Function để tạo image preview
+        function createImagePreview(file, uniqueId) {
+            const preview = document.getElementById("thumbnailPreview");
+            const previewContainer = createPreviewContainer();
+
+            if (!preview.contains(previewContainer)) {
+                preview.appendChild(previewContainer);
+            }
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const imgContainer = document.createElement('div');
+                imgContainer.style.position = 'relative';
+                imgContainer.style.display = 'inline-block';
+                imgContainer.id = `preview_${uniqueId}`;
+
+                const img = document.createElement('img');
+                img.src = e.target.result;
+                img.style.width = '100px';
+                img.style.height = '100px';
+                img.style.objectFit = 'cover';
+                img.style.border = '2px solid #ddd';
+                img.style.borderRadius = '5px';
+
+                // Nút xóa
+                const removeBtn = document.createElement('button');
+                removeBtn.type = 'button';
+                removeBtn.innerHTML = '×';
+                removeBtn.style.position = 'absolute';
+                removeBtn.style.top = '-5px';
+                removeBtn.style.right = '-5px';
+                removeBtn.style.width = '20px';
+                removeBtn.style.height = '20px';
+                removeBtn.style.borderRadius = '50%';
+                removeBtn.style.border = 'none';
+                removeBtn.style.backgroundColor = '#dc3545';
+                removeBtn.style.color = 'white';
+                removeBtn.style.fontSize = '12px';
+                removeBtn.style.cursor = 'pointer';
+                removeBtn.style.display = 'flex';
+                removeBtn.style.alignItems = 'center';
+                removeBtn.style.justifyContent = 'center';
+                removeBtn.title = 'Remove image';
+
+                removeBtn.addEventListener('click', function() {
+                    removeFile(uniqueId);
+                });
+
+                const fileName = document.createElement('div');
+                fileName.textContent = file.name;
+                fileName.style.fontSize = '10px';
+                fileName.style.marginTop = '5px';
+                fileName.style.textAlign = 'center';
+                fileName.style.wordBreak = 'break-all';
+                fileName.style.maxWidth = '100px';
+
+                imgContainer.appendChild(img);
+                imgContainer.appendChild(removeBtn);
+                imgContainer.appendChild(fileName);
+                previewContainer.appendChild(imgContainer);
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Function để remove file
+        function removeFile(uniqueId) {
+            // Remove từ selectedFiles array
+            selectedFiles = selectedFiles.filter(item => item.id !== uniqueId);
+
+            // Remove preview
+            const previewElement = document.getElementById(`preview_${uniqueId}`);
+            if (previewElement) {
+                previewElement.remove();
+            }
+
+            // Remove hidden input
+            const hiddenInput = document.getElementById(`hiddenFile_${uniqueId}`);
+            if (hiddenInput) {
+                hiddenInput.remove();
+            }
+
+            updateFileCount();
+
+            // Nếu không còn file nào, xóa preview container
+            if (selectedFiles.length === 0) {
+                const previewContainer = document.getElementById('previewContainer');
+                if (previewContainer) {
+                    previewContainer.remove();
+                }
+            }
+        }
+
+        // Xử lý khi chọn file từ input chính
+        document.getElementById("thumbnails").addEventListener("change", function (e) {
+            if (this.files.length > 0) {
+                addFilesToCollection(this.files);
+                // Reset input để có thể chọn lại cùng file
+                this.value = '';
+            }
+        });
+
+        // Xử lý nút "Add More Images"
+        document.getElementById("addMoreThumbnails").addEventListener("click", function() {
+            document.getElementById("thumbnails").click();
+        });
+
+        // Form validation before submission
+        function validateForm() {
+            let isValid = true;
+            let errorMessage = '';
+
+            // Check Title
+            const title = document.querySelector('input[name="Title"]').value;
+            if (!title.trim()) {
+                isValid = false;
+                errorMessage += '• Title is required\n';
+            }
+
+            // Check Region
+            const regionId = document.querySelector('select[name="RegionId"]').value;
+            if (!regionId) {
+                isValid = false;
+                errorMessage += '• Region is required\n';
+            }
+
+            // Check Content Type
+            const contentType = document.querySelector('input[name="ContentType"]').value;
+            if (!contentType.trim()) {
+                isValid = false;
+                errorMessage += '• Content Type is required\n';
+            }
+
+            // Check Content
+            const content = editor ? editor.getData() : document.querySelector('#editor').value;
+            if (!content.trim()) {
+                isValid = false;
+                errorMessage += '• Content is required\n';
+            }
+
+            if (!isValid) {
+                Swal.fire({
+                    title: 'Validation Error',
+                    text: errorMessage,
+                    icon: 'error',
+                    confirmButtonColor: '#d33'
+                });
+            }
+
+            return isValid;
+        }
+
+        // Xử lý submit form với confirmation và format tags
+        document.getElementById('blogForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            // Sync CKEditor content
+            if (editor) {
+                document.querySelector('#editor').value = editor.getData();
+            }
+
+            // Format tags trước khi submit
+            const tagsInput = document.getElementById('tagsInput');
+            const formattedTagsInput = document.getElementById('formattedTags');
+
+            if (tagsInput.value.trim()) {
+                const formattedTags = formatTags(tagsInput.value);
+                // Cập nhật giá trị Tags để gửi lên server
+                tagsInput.value = formattedTags;
+                formattedTagsInput.value = formattedTags;
+            }
+
+            // Validate form
+            if (!validateForm()) {
+                return;
+            }
+
+            Swal.fire({
+                title: 'Confirm Submission',
+                html: `Do you want to submit this blog?<br><br>${tagsInput.value ? '<strong>Tags:</strong> ' + tagsInput.value : ''}`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, submit!',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Hiển thị loading
+                    Swal.fire({
+                        title: 'Submitting...',
+                        text: 'Please wait while we process your blog.',
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+
+                    e.target.submit();
+                }
+            });
+        });
+
+        // Hiển thị thông báo success/error
+        @if (TempData["Success"] != null)
+        {
+            <text>
+                        Swal.fire({
+                            title: 'Success!',
+                            text: '@TempData["Success"]',
+                            icon: 'success',
+                            confirmButtonColor: '#28a745'
+                        });
+            </text>
+        }
+
+        @if (TempData["Error"] != null)
+        {
+            <text>
+                        Swal.fire({
+                            title: 'Error!',
+                            text: '@TempData["Error"]',
+                            icon: 'error',
+                            confirmButtonColor: '#d33'
+                        });
+            </text>
+        }
+    </script>
+
+</body>
+</html>

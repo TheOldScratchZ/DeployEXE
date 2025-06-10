@@ -1,0 +1,80 @@
+﻿@model EXE.Models.Product
+@{
+    ViewData["Title"] = "Thêm sản phẩm";
+}
+@{
+    Layout = "~/Views/Shared/DashboardLayout.cshtml";
+}
+<h2 class="text-center mb-4">Thêm sản phẩm mới</h2>
+@Html.Partial("~/Views/chatbox.cshtml")
+
+<form asp-action="Create" method="post" enctype="multipart/form-data" class="mx-auto" style="max-width: 700px;">
+    <div class="mb-3">
+        <label class="form-label">Tên sản phẩm</label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Mô tả</label>
+        <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+        <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Giá</label>
+        <input asp-for="Price" class="form-control" type="number" step="1000" />
+        <span asp-validation-for="Price" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Số lượng trong kho</label>
+        <input asp-for="Stock" class="form-control" type="number" />
+        <span asp-validation-for="Stock" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Vùng sản xuất</label>
+        <select asp-for="RegionId" class="form-select" asp-items="ViewBag.Regions">
+            <option value="">-- Chọn vùng --</option>
+        </select>
+        <span asp-validation-for="RegionId" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Ảnh sản phẩm</label>
+        <input type="file" name="Images" id="imageInput" class="form-control" multiple onchange="previewImages(event)" />
+        <small class="text-muted">Bạn có thể chọn nhiều ảnh</small>
+        <div id="imagePreview" class="d-flex gap-2 mt-2 flex-wrap"></div>
+    </div>
+
+    <div class="d-flex justify-content-between mt-4">
+        <a asp-action="Shop" class="btn btn-outline-secondary">Quay lại</a>
+        <button type="submit" class="btn btn-primary">Thêm sản phẩm</button>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        function previewImages(event) {
+            const files = event.target.files;
+            const preview = document.getElementById('imagePreview');
+            preview.innerHTML = "";
+
+            Array.from(files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const img = document.createElement("img");
+                    img.src = e.target.result;
+                    img.className = "img-thumbnail";
+                    img.style.width = "100px";
+                    img.style.height = "100px";
+                    img.style.objectFit = "cover";
+                    preview.appendChild(img);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+    </script>
+}

@@ -1,0 +1,699 @@
+﻿@model List<EXE.Models.Blog>
+@{
+    ViewData["Title"] = "Quản Lý Blog - Admin Dashboard";
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .admin-header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 20px 0;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .page-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .management-container {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        .controls-section {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .search-controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex: 1;
+        }
+
+        .search-input {
+            padding: 8px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            width: 300px;
+        }
+
+        .filter-select {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            min-width: 150px;
+        }
+
+        .btn-create {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+        }
+
+            .btn-create:hover {
+                background: #218838;
+                color: white;
+                text-decoration: none;
+            }
+
+        .table-container {
+            overflow-x: auto;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+
+        .blog-table {
+            margin-bottom: 0;
+        }
+
+            .blog-table th {
+                background-color: #f8f9fa;
+                border-bottom: 2px solid #dee2e6;
+                font-weight: 600;
+                color: #495057;
+                padding: 15px 12px;
+                white-space: nowrap;
+            }
+
+            .blog-table td {
+                padding: 12px;
+                vertical-align: middle;
+                border-bottom: 1px solid #e9ecef;
+            }
+
+            .blog-table tbody tr:hover {
+                background-color: #f8f9fa;
+            }
+
+        .blog-thumbnail {
+            width: 60px;
+            height: 40px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+
+        .blog-title {
+            max-width: 200px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-weight: 500;
+        }
+
+        .blog-content {
+            max-width: 150px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        .status-badge {
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            font-weight: 500;
+        }
+
+        .status-active {
+            background-color: #d1edff;
+            color: #0c5460;
+        }
+
+        .rating-display {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .stars {
+            color: #ffc107;
+            font-size: 0.9em;
+        }
+
+        .rating-number {
+            font-size: 0.8em;
+            color: #6c757d;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            white-space: nowrap;
+        }
+
+        .btn-edit {
+            background: #17a2b8;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            text-decoration: none;
+        }
+
+            .btn-edit:hover {
+                background: #138496;
+                color: white;
+                text-decoration: none;
+            }
+
+        .btn-delete {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 0.8em;
+        }
+
+            .btn-delete:hover {
+                background: #c82333;
+            }
+
+        .pagination-container {
+            margin-top: 25px;
+            display: flex;
+            justify-content: between;
+            align-items: center;
+        }
+
+        .results-info {
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        .pagination {
+            margin: 0;
+        }
+
+        .page-link {
+            color: #495057;
+            border: 1px solid #dee2e6;
+        }
+
+            .page-link:hover {
+                background-color: #e9ecef;
+                border-color: #dee2e6;
+            }
+
+        .page-item.active .page-link {
+            background-color: #2c3e50;
+            border-color: #2c3e50;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 50px 20px;
+            color: #6c757d;
+        }
+
+        .region-tag {
+            background: #e7f3ff;
+            color: #0066cc;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.8em;
+        }
+
+        .content-type-tag {
+            background: #fff3cd;
+            color: #856404;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.8em;
+        }
+    </style>
+</head>
+<body>
+    @{
+        Layout = (User.IsInRole("Admin") || User.IsInRole("Staff"))
+        ? "~/Views/Shared/DashboardLayout.cshtml"
+        : "~/Views/Shared/ProductLayout.cshtml";
+    }
+
+    <!-- Header -->
+    <div class="container">
+        <div class="management-container">
+            <!-- Controls Section -->
+            <div class="controls-section">
+                <div class="search-controls">
+                    <input type="text" id="searchInput" class="search-input"
+                           placeholder="Tìm kiếm theo tiêu đề, nội dung..."
+                           onkeyup="filterBlogs()">
+
+                    <select id="regionFilter" class="filter-select" onchange="filterBlogs()">
+                        <option value="">Tất cả vùng miền</option>
+                        <!-- Regions will be populated by JavaScript -->
+                    </select>
+
+                    <select id="contentTypeFilter" class="filter-select" onchange="filterBlogs()">
+                        <option value="">Tất cả loại nội dung</option>
+                        <!-- Content types will be populated by JavaScript -->
+                    </select>
+
+                    <select id="sortBy" class="filter-select" onchange="sortBlogs()">
+                        <option value="">Sắp xếp mặc định</option>
+                        <option value="date-desc">Ngày tạo mới nhất</option>
+                        <option value="date-asc">Ngày tạo cũ nhất</option>
+                        <option value="rating-desc">Rating cao nhất</option>
+                        <option value="rating-asc">Rating thấp nhất</option>
+                        <option value="title-asc">Tiêu đề A-Z</option>
+                        <option value="title-desc">Tiêu đề Z-A</option>
+                    </select>
+                </div>
+
+                <a href="/Blog/AddBlog" class="btn-create">
+                    <i class="fas fa-plus me-1"></i>
+                    Thêm Blog Mới
+                </a>
+            </div>
+
+            <!-- Results Info -->
+            <div class="mb-3">
+                <span id="resultsCount" class="results-info">Đang tải...</span>
+            </div>
+
+            <!-- Table -->
+            <div class="table-container">
+                @if (Model != null && Model.Any())
+                {
+                    <table class="table blog-table">
+                        <thead>
+                            <tr>
+                                <th>Hình ảnh</th>
+                                <th>Tiêu đề</th>
+                                <th>Nội dung</th>
+                                <th>Vùng miền</th>
+                                <th>Loại</th>
+                                <th>Rating</th>
+                                <th>Ngày tạo</th>
+                                <th>Tác giả</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="blogTableBody">
+                            @foreach (var blog in Model)
+                            {
+                                var thumbnailPaths = !string.IsNullOrEmpty(blog.Thumbnail) ? blog.Thumbnail.Split(',') : new string[0];
+                                var firstThumbnail = thumbnailPaths.FirstOrDefault()?.Trim();
+
+                                string excerpt = "Chưa có nội dung";
+                                if (!string.IsNullOrEmpty(blog.Content))
+                                {
+                                    var textContent = System.Text.RegularExpressions.Regex.Replace(blog.Content, "<[^>]*>", "");
+                                    excerpt = textContent.Length > 50 ? textContent.Substring(0, 50) + "..." : textContent;
+                                }
+
+                                <tr class="blog-row"
+                                    data-title="@blog.Title.ToLower()"
+                                    data-region="@(blog.Region?.Name?.ToLower() ?? "")"
+                                    data-content="@excerpt.ToLower()"
+                                    data-contenttype="@(blog.ContentType?.ToLower() ?? "")"
+                                    data-rating="@blog.Star"
+                                    data-date="@blog.CreatedAt.ToString("yyyy-MM-dd")">
+
+                                    <td>
+                                        @if (!string.IsNullOrEmpty(firstThumbnail))
+                                        {
+                                            <img src="@firstThumbnail" alt="@blog.Title" class="blog-thumbnail" />
+                                        }
+                                        else
+                                        {
+                                            <div class="blog-thumbnail d-flex align-items-center justify-content-center bg-light">
+                                                <i class="fas fa-image text-muted"></i>
+                                            </div>
+                                        }
+                                    </td>
+
+                                    <td>
+                                        <div class="blog-title" title="@blog.Title">
+                                            @blog.Title
+                                        </div>
+                                    </td>
+
+                                    <td>
+                                        <div class="blog-content" title="@excerpt">
+                                            @excerpt
+                                        </div>
+                                    </td>
+
+                                    <td>
+                                        <span class="region-tag">
+                                            @(blog.Region?.Name ?? "Toàn quốc")
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        @if (!string.IsNullOrEmpty(blog.ContentType))
+                                        {
+                                            <span class="content-type-tag">@blog.ContentType</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">-</span>
+                                        }
+                                    </td>
+
+                                    <td>
+                                        <div class="rating-display">
+                                            <div class="stars">
+                                                @for (int i = 1; i <= 5; i++)
+                                                {
+                                                    if (i <= Math.Floor(blog.Star))
+                                                    {
+                                                        <i class="fas fa-star"></i>
+                                                    }
+                                                    else if (i == Math.Ceiling(blog.Star) && blog.Star % 1 != 0)
+                                                    {
+                                                        <i class="fas fa-star-half-alt"></i>
+                                                    }
+                                                    else
+                                                    {
+                                                        <i class="far fa-star"></i>
+                                                    }
+                                                }
+                                            </div>
+                                            <span class="rating-number">(@blog.Star.ToString("F1"))</span>
+                                        </div>
+                                    </td>
+
+                                    <td>
+                                        @blog.CreatedAt.ToString("dd/MM/yyyy")
+                                    </td>
+
+                                    <td>
+                                        @(blog.User?.UserName ?? "System")
+                                    </td>
+
+                                    <td>
+                                        <div class="action-buttons">
+                                            <a href="@Url.Action("EditBlog", "Blog", new { id = blog.Id })"
+                                               class="btn-edit" title="Chỉnh sửa">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <button onclick="confirmDelete('@blog.Id')"
+                                                    class="btn-delete" title="Xóa">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <div class="no-results">
+                        <i class="fas fa-blog fa-3x mb-3"></i>
+                        <h4>Chưa có blog nào</h4>
+                        <p>Hiện tại chưa có blog nào trong hệ thống.</p>
+                    </div>
+                }
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination-container">
+                <div class="results-info">
+                    <span id="paginationInfo"></span>
+                </div>
+                <nav>
+                    <ul class="pagination" id="pagination">
+                        <!-- Pagination will be generated by JavaScript -->
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Global variables
+        let currentPage = 1;
+        const itemsPerPage = 10;
+        let filteredBlogs = [];
+        let allBlogs = [];
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeBlogs();
+            populateFilters();
+            updateResultsCount();
+            generatePagination();
+            displayCurrentPage();
+        });
+
+        function initializeBlogs() {
+            allBlogs = Array.from(document.querySelectorAll('.blog-row'));
+            filteredBlogs = [...allBlogs];
+            console.log('Total blogs found:', allBlogs.length);
+        }
+
+        function populateFilters() {
+            populateRegionFilter();
+            populateContentTypeFilter();
+        }
+
+        function populateRegionFilter() {
+            const regions = new Set();
+            allBlogs.forEach(blog => {
+                const region = blog.dataset.region;
+                if (region && region.trim()) regions.add(region.trim());
+            });
+
+            const regionFilter = document.getElementById('regionFilter');
+            Array.from(regions).sort().forEach(region => {
+                const option = document.createElement('option');
+                option.value = region;
+                option.textContent = region.charAt(0).toUpperCase() + region.slice(1);
+                regionFilter.appendChild(option);
+            });
+        }
+
+        function populateContentTypeFilter() {
+            const types = new Set();
+            allBlogs.forEach(blog => {
+                const type = blog.dataset.contenttype;
+                if (type && type.trim()) types.add(type.trim());
+            });
+
+            const typeFilter = document.getElementById('contentTypeFilter');
+            Array.from(types).sort().forEach(type => {
+                const option = document.createElement('option');
+                option.value = type;
+                option.textContent = type.charAt(0).toUpperCase() + type.slice(1);
+                typeFilter.appendChild(option);
+            });
+        }
+
+        function filterBlogs() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+            const selectedRegion = document.getElementById('regionFilter').value.toLowerCase();
+            const selectedType = document.getElementById('contentTypeFilter').value.toLowerCase();
+
+            filteredBlogs = allBlogs.filter(blog => {
+                const title = blog.dataset.title || '';
+                const content = blog.dataset.content || '';
+                const region = blog.dataset.region || '';
+                const contentType = blog.dataset.contenttype || '';
+
+                const matchesSearch = !searchTerm ||
+                    title.includes(searchTerm) ||
+                    content.includes(searchTerm);
+                const matchesRegion = !selectedRegion || region === selectedRegion;
+                const matchesType = !selectedType || contentType === selectedType;
+
+                return matchesSearch && matchesRegion && matchesType;
+            });
+
+            sortBlogs();
+            currentPage = 1;
+            updateResultsCount();
+            generatePagination();
+            displayCurrentPage();
+        }
+
+        function sortBlogs() {
+            const sortBy = document.getElementById('sortBy').value;
+            if (!sortBy) return;
+
+            filteredBlogs.sort((a, b) => {
+                switch(sortBy) {
+                    case 'date-desc':
+                        return new Date(b.dataset.date) - new Date(a.dataset.date);
+                    case 'date-asc':
+                        return new Date(a.dataset.date) - new Date(b.dataset.date);
+                    case 'rating-desc':
+                        return parseFloat(b.dataset.rating) - parseFloat(a.dataset.rating);
+                    case 'rating-asc':
+                        return parseFloat(a.dataset.rating) - parseFloat(b.dataset.rating);
+                    case 'title-asc':
+                        return a.dataset.title.localeCompare(b.dataset.title);
+                    case 'title-desc':
+                        return b.dataset.title.localeCompare(a.dataset.title);
+                    default:
+                        return 0;
+                }
+            });
+        }
+
+        function updateResultsCount() {
+            const count = filteredBlogs.length;
+            const total = allBlogs.length;
+            const resultsText = `Hiển thị ${count} trên tổng ${total} blog`;
+
+            document.getElementById('resultsCount').textContent = resultsText;
+        }
+
+        function generatePagination() {
+            const totalPages = Math.ceil(filteredBlogs.length / itemsPerPage);
+            const paginationContainer = document.getElementById('pagination');
+            const paginationInfo = document.getElementById('paginationInfo');
+
+            if (totalPages <= 1) {
+                paginationContainer.innerHTML = '';
+                paginationInfo.textContent = '';
+                return;
+            }
+
+            // Update pagination info
+            const startItem = (currentPage - 1) * itemsPerPage + 1;
+            const endItem = Math.min(currentPage * itemsPerPage, filteredBlogs.length);
+            paginationInfo.textContent = `Hiển thị ${startItem}-${endItem} trên ${filteredBlogs.length} kết quả`;
+
+            // Generate pagination links
+            let html = '';
+
+            if (currentPage > 1) {
+                html += `<li class="page-item">
+                    <a class="page-link" href="#" onclick="goToPage(${currentPage - 1}); return false;">
+                        <i class="fas fa-chevron-left"></i>
+                    </a>
+                </li>`;
+            }
+
+            for (let i = 1; i <= totalPages; i++) {
+                if (i === currentPage) {
+                    html += `<li class="page-item active">
+                        <a class="page-link" href="#" onclick="return false;">${i}</a>
+                    </li>`;
+                } else if (i === 1 || i === totalPages || (i >= currentPage - 2 && i <= currentPage + 2)) {
+                    html += `<li class="page-item">
+                        <a class="page-link" href="#" onclick="goToPage(${i}); return false;">${i}</a>
+                    </li>`;
+                } else if (i === currentPage - 3 || i === currentPage + 3) {
+                    html += `<li class="page-item disabled">
+                        <span class="page-link">...</span>
+                    </li>`;
+                }
+            }
+
+            if (currentPage < totalPages) {
+                html += `<li class="page-item">
+                    <a class="page-link" href="#" onclick="goToPage(${currentPage + 1}); return false;">
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                </li>`;
+            }
+
+            paginationContainer.innerHTML = html;
+        }
+
+        function goToPage(page) {
+            currentPage = page;
+            displayCurrentPage();
+            generatePagination();
+
+            // Scroll to top of table
+            document.querySelector('.table-container').scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }
+
+        function displayCurrentPage() {
+            // Hide all rows
+            allBlogs.forEach(blog => {
+                blog.style.display = 'none';
+            });
+
+            // Show filtered rows for current page
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const blogsToShow = filteredBlogs.slice(startIndex, endIndex);
+
+            blogsToShow.forEach(blog => {
+                blog.style.display = 'table-row';
+            });
+
+            // Show/hide no results message
+            const noResultsMessage = document.querySelector('.no-results');
+            if (filteredBlogs.length === 0 && noResultsMessage) {
+                noResultsMessage.style.display = 'block';
+            } else if (noResultsMessage) {
+                noResultsMessage.style.display = 'none';
+            }
+        }
+                       function confirmDelete(blogId) {
+            if (confirm('Bạn có chắc chắn muốn xóa blog này không?')) {
+                // Tạo form để submit DELETE request
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '/Blog/DeleteBlogConfirm'; // Sử dụng action có sẵn
+
+                const idInput = document.createElement('input');
+                idInput.type = 'hidden';
+                idInput.name = 'id';
+                idInput.value = blogId;
+
+                // Lấy CSRF token
+                const tokenInput = document.createElement('input');
+                tokenInput.type = 'hidden';
+                tokenInput.name = '__RequestVerificationToken';
+                const tokenElement = document.querySelector('input[name="__RequestVerificationToken"]');
+                if (tokenElement) {
+                    tokenInput.value = tokenElement.value;
+                }
+
+                form.appendChild(idInput);
+                form.appendChild(tokenInput);
+                document.body.appendChild(form);
+                form.submit();
+            }
+        }
+    </script>
+
+    <!-- Add CSRF token for delete operations -->
+    @Html.AntiForgeryToken()
+</body>
+</html>

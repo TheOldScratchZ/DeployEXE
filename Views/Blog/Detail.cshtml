@@ -1,0 +1,681 @@
+﻿@model EXE.Models.Blog
+@using EXE.Models
+@{
+    ViewData["Title"] = Model.Title;
+    var relatedBlogs = ViewBag.RelatedBlogs as List<Blog>;
+    var thumbnailPaths = !string.IsNullOrEmpty(Model.Thumbnail) ? Model.Thumbnail.Split(',') : new string[0];
+    var totalRatings = ViewBag.TotalRatings ?? 0;
+    var userRating = ViewBag.UserRating ?? 0;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    @Html.Partial("~/Views/chatbox.cshtml")
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        .breadcrumb-nav {
+            background: none;
+            padding: 15px 0;
+            font-size: 14px;
+        }
+
+            .breadcrumb-nav a {
+                color: #28a745;
+                text-decoration: none;
+            }
+
+                .breadcrumb-nav a:hover {
+                    text-decoration: underline;
+                }
+
+        .product-layout {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+
+        .product-gallery {
+            background: #f8f9fa;
+            padding: 20px;
+        }
+
+        .main-image {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .thumbnail-list {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .thumbnail-item {
+            width: 80px;
+            height: 80px;
+            border-radius: 4px;
+            overflow: hidden;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: border-color 0.3s;
+        }
+
+            .thumbnail-item:hover,
+            .thumbnail-item.active {
+                border-color: #28a745;
+            }
+
+            .thumbnail-item img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+
+        .product-info {
+            padding: 30px;
+        }
+
+        .product-title {
+            font-size: 28px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+            line-height: 1.3;
+        }
+
+        .rating-section {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .stars {
+            display: flex;
+            gap: 2px;
+        }
+
+        .star {
+            color: #ddd;
+            font-size: 18px;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+            .star.filled {
+                color: #ffc107;
+            }
+
+            .star:hover {
+                color: #ffc107;
+            }
+
+        .rating-info {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .product-meta {
+            border-top: 1px solid #eee;
+            border-bottom: 1px solid #eee;
+            padding: 20px 0;
+            margin: 20px 0;
+        }
+
+        .meta-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .meta-label {
+            font-weight: 600;
+            color: #666;
+        }
+
+        .meta-value {
+            color: #333;
+        }
+
+        .distribution-system {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 20px 0;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .share-section {
+            margin-top: 30px;
+        }
+
+        .share-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .share-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 6px;
+            border: none;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: transform 0.2s;
+        }
+
+            .share-btn:hover {
+                transform: translateY(-2px);
+            }
+
+            .share-btn.facebook {
+                background: #3b5998;
+            }
+
+            .share-btn.zalo {
+                background: #0068ff;
+            }
+
+            .share-btn.twitter {
+                background: #1da1f2;
+            }
+
+            .share-btn.email {
+                background: #666;
+            }
+
+        .content-section {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .content-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #28a745;
+            padding-bottom: 10px;
+        }
+
+        .blog-content {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #444;
+        }
+
+            .blog-content img {
+                max-width: 100%;
+                height: auto;
+                border-radius: 8px;
+                margin: 20px 0;
+            }
+
+            .blog-content p {
+                margin-bottom: 15px;
+            }
+
+            .blog-content h1, .blog-content h2, .blog-content h3 {
+                margin-top: 30px;
+                margin-bottom: 15px;
+                color: #333;
+            }
+
+        .external-link {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            padding: 12px 25px;
+            border-radius: 6px;
+            text-decoration: none;
+            display: inline-block;
+            margin: 20px 0;
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+
+        .external-link:hover {
+        transform: translateY(-2px);
+        color: white;
+        text-decoration: none;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .btn-action {
+            padding: 10px 20px;
+            border-radius: 6px;
+            border: none;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: transform 0.2s;
+        }
+
+            .btn-action:hover {
+                transform: translateY(-1px);
+                text-decoration: none;
+            }
+
+        .btn-back {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-edit {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        .rating-modal .modal-content {
+            border-radius: 12px;
+        }
+
+        .rating-modal .stars {
+            font-size: 24px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+    </style>
+</head>
+<body>
+    @{
+        if (User.Identity != null && User.Identity.IsAuthenticated)
+        {
+            Layout = (User.IsInRole("Admin") || User.IsInRole("Staff"))
+            ? "~/Views/Shared/DashboardLayout.cshtml"
+            : "~/Views/Shared/ProductLayout.cshtml";
+        }
+        else
+        {
+            Layout = "~/Views/Shared/ProductLayout.cshtml";
+        }
+    }
+    <!-- Header Section -->
+    <div class="d-flex gap-2 mb-3 flex-wrap">
+        @if(User.IsInRole("Staff") || User.IsInRole("Admin"))
+        {
+            <a href="@Url.Action("EditBlog", "Blog", new { id = Model.Id })" class="btn btn-warning">
+                <i class="fas fa-edit"></i> Edit Blog
+            </a>
+        }
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="container">
+        <div class="action-buttons">
+            <a href="@Url.Action("Index", "Blog")" class="btn-action btn-back">
+                <i class="fas fa-arrow-left"></i> Quay lại
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Product Layout -->
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-6">
+                <!-- Product Gallery -->
+                <div class="product-gallery">
+                    @if (thumbnailPaths.Length > 0)
+                    {
+                        <img id="mainImage" src="@thumbnailPaths[0].Trim()" alt="@Model.Title" class="main-image" />
+                        <div class="thumbnail-list">
+                            @for (int i = 0; i < thumbnailPaths.Length; i++)
+                            {
+                                if (!string.IsNullOrWhiteSpace(thumbnailPaths[i]))
+                                {
+                                    <div class="thumbnail-item @(i == 0 ? "active" : "")" onclick="changeMainImage('@thumbnailPaths[i].Trim()', this)">
+                                        <img src="@thumbnailPaths[i].Trim()" alt="Thumbnail @(i+1)" />
+                                    </div>
+                                }
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="main-image d-flex align-items-center justify-content-center bg-light">
+                            <i class="fas fa-image fa-4x text-muted"></i>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <!-- Product Info -->
+                <div class="product-info">
+                    <h1 class="product-title">@Model.Title</h1>
+
+                    <!-- Rating Section -->
+                    <div class="rating-section">
+                        <div class="stars" id="displayStars">
+                            @for (int i = 1; i <= 5; i++)
+                            {
+                                <i class="fas fa-star star @(i <= Model.Star ? "filled" : "")" data-rating="@i"></i>
+                            }
+                        </div>
+                        <div class="rating-info">
+                            <span>@Model.Star.ToString("F1")/5</span>
+                            <span class="text-muted">(@totalRatings đánh giá)</span>
+                        </div>
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <button class="btn btn-sm btn-outline-primary ms-2" onclick="openRatingModal()">
+                                <i class="fas fa-star"></i> Đánh giá
+                            </button>
+                        }
+                    </div>
+
+                    <!-- Product Meta -->
+                    <div class="product-meta">
+                        <div class="meta-row">
+                            <span class="meta-label">XUẤT XỨ:</span>
+                            <span class="meta-value">@(Model.Region?.Name ?? "Không xác định")</span>
+                        </div>
+                        <div class="meta-row">
+                            <span class="meta-label">NHÓM BÀI VIẾT:</span>
+                            <span class="meta-value">@Model.ContentType</span>
+                        </div>
+                        <div class="meta-row">
+                            <span class="meta-label">LOẠI BÀI VIẾT:</span>
+                            <span class="meta-value">@(!string.IsNullOrEmpty(Model.Tags) ? Model.Tags : "Tổng hợp")</span>
+                        </div>
+                        <div class="meta-row">
+                            <span class="meta-label">NGÀY ĐĂNG:</span>
+                            <span class="meta-value">@Model.CreatedAt.ToString("dd/MM/yyyy")</span>
+                        </div>
+                        @if (Model.UpdatedAt.HasValue)
+                        {
+                            <div class="meta-row">
+                                <span class="meta-label">CÂP NHẬT:</span>
+                                <span class="meta-value">@Model.UpdatedAt.Value.ToString("dd/MM/yyyy")</span>
+                            </div>
+                        }
+                        <div class="meta-row">
+                            <span class="meta-label">TÁC GIẢ:</span>
+                            <span class="meta-value">@(Model.User?.UserName ?? "Ẩn danh")</span>
+                        </div>
+                    </div>
+
+                    <!-- Distribution System -->
+                    <div class="distribution-system">
+                        <strong>HỆ THỐNG PHÂN PHỐI:</strong><br>
+                        Chia sẻ qua mạng điện tử, siêu thị, hội chợ, các đại lý...
+                    </div>
+
+                    <!-- External Link -->
+                    @if (!string.IsNullOrEmpty(Model.Link))
+                    {
+                        <a href="@Model.Link" target="_blank" class="external-link">
+                            <i class="fas fa-external-link-alt"></i> Xem nguồn gốc
+                        </a>
+                    }
+
+                    <!-- Share Section -->
+                    <div class="share-section">
+                        <strong>CHIA SẺ:</strong>
+                        <div class="share-buttons">
+                            <a href="#" class="share-btn facebook" onclick="shareOnFacebook()">
+                                <i class="fab fa-facebook-f"></i>
+                            </a>
+                            <a href="#" class="share-btn zalo" onclick="shareOnZalo()">
+                                <span style="font-weight: bold; font-size: 12px;">Z</span>
+                            </a>
+                            <a href="#" class="share-btn twitter" onclick="shareOnTwitter()">
+                                <i class="fab fa-twitter"></i>
+                            </a>
+                            <a href="#" class="share-btn email" onclick="shareViaEmail()">
+                                <i class="fas fa-envelope"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Content Section -->
+    <div class="container">
+        <div class="content-section">
+            <h2 class="content-title">Thông tin chi tiết</h2>
+            <div class="blog-content">
+                @Html.Raw(Model.Content)
+            </div>
+        </div>
+    </div>
+
+    <!-- Related Blogs Section -->
+    @if (relatedBlogs != null && relatedBlogs.Any())
+    {
+        <div class="container">
+            <div class="content-section">
+                <h2 class="content-title">Bài viết liên quan</h2>
+                <div class="row">
+                    @foreach (var relatedBlog in relatedBlogs)
+                    {
+                        <div class="col-md-6 col-lg-3 mb-3">
+                            <div class="card h-100">
+                                @{
+                                    var relatedThumbnails = !string.IsNullOrEmpty(relatedBlog.Thumbnail) ? relatedBlog.Thumbnail.Split(',') : new string[0];
+                                    var firstThumbnail = relatedThumbnails.FirstOrDefault()?.Trim();
+                                }
+                                @if (!string.IsNullOrEmpty(firstThumbnail))
+                                {
+                                    <img src="@firstThumbnail" class="card-img-top" style="height: 150px; object-fit: cover;" alt="@relatedBlog.Title" />
+                                }
+                                <div class="card-body">
+                                    <h6 class="card-title">@relatedBlog.Title</h6>
+                                    <small class="text-muted">@relatedBlog.CreatedAt.ToString("dd/MM/yyyy")</small>
+                                </div>
+                                <div class="card-footer">
+                                    <a href="@Url.Action("Detail", "Blog", new { id = relatedBlog.Id })" class="btn btn-sm btn-outline-primary">
+                                        Xem chi tiết
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Rating Modal -->
+    @if (User.Identity.IsAuthenticated)
+    {
+        <div class="modal fade rating-modal" id="ratingModal" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Đánh giá bài viết</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body text-center">
+                        <p>Bạn đánh giá bài viết này như thế nào?</p>
+                        <div class="stars" id="ratingStars">
+                            @for (int i = 1; i <= 5; i++)
+                            {
+                                <i class="fas fa-star star" data-rating="@i" onclick="setRating(@i)"></i>
+                            }
+                        </div>
+                        <div id="ratingMessage" class="mt-3"></div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="button" class="btn btn-primary" onclick="submitRating()" id="submitRatingBtn" disabled>
+                            Gửi đánh giá
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let selectedRating = @userRating;
+        const blogId = '@Model.Id';
+
+        // Initialize user rating if exists
+        if (selectedRating > 0) {
+            updateRatingDisplay();
+        }
+
+        function changeMainImage(src, thumbnail) {
+            document.getElementById('mainImage').src = src;
+
+            // Update active thumbnail
+            document.querySelectorAll('.thumbnail-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            thumbnail.classList.add('active');
+        }
+
+        function openRatingModal() {
+            const modal = new bootstrap.Modal(document.getElementById('ratingModal'));
+            updateModalStars();
+            modal.show();
+        }
+
+        function setRating(rating) {
+            selectedRating = rating;
+            updateModalStars();
+            document.getElementById('submitRatingBtn').disabled = false;
+
+            const messages = [
+                '', 'Rất tệ', 'Tệ', 'Bình thường', 'Tốt', 'Rất tốt'
+            ];
+            document.getElementById('ratingMessage').textContent = messages[rating];
+        }
+
+        function updateModalStars() {
+            const stars = document.querySelectorAll('#ratingStars .star');
+            stars.forEach((star, index) => {
+                if (index < selectedRating) {
+                    star.classList.add('filled');
+                } else {
+                    star.classList.remove('filled');
+                }
+            });
+        }
+
+        function updateRatingDisplay() {
+            const displayStars = document.querySelectorAll('#displayStars .star');
+            displayStars.forEach((star, index) => {
+                if (index < selectedRating) {
+                    star.classList.add('filled');
+                } else {
+                    star.classList.remove('filled');
+                }
+            });
+        }
+
+        function submitRating() {
+            if (selectedRating === 0) return;
+
+            const submitBtn = document.getElementById('submitRatingBtn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Đang gửi...';
+
+            fetch('@Url.Action("RateBlog", "Blog")', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `blogId=${blogId}&rating=${selectedRating}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update display
+                    document.querySelector('.rating-info span').textContent = `${data.averageRating}/5`;
+                    updateRatingDisplay();
+
+                    // Close modal
+                    bootstrap.Modal.getInstance(document.getElementById('ratingModal')).hide();
+
+                    // Show success message
+                    alert('Cảm ơn bạn đã đánh giá!');
+                } else {
+                    alert(data.message || 'Có lỗi xảy ra khi gửi đánh giá');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Có lỗi xảy ra khi gửi đánh giá');
+            })
+            .finally(() => {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Gửi đánh giá';
+            });
+        }
+
+        // Share functions
+        function shareOnFacebook() {
+            const url = encodeURIComponent(window.location.href);
+            const title = encodeURIComponent('@Model.Title');
+            window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}&quote=${title}`, '_blank', 'width=600,height=400');
+        }
+
+        function shareOnZalo() {
+            const url = encodeURIComponent(window.location.href);
+            const title = encodeURIComponent('@Model.Title');
+            window.open(`https://zalo.me/share/url?url=${url}&title=${title}`, '_blank', 'width=600,height=400');
+        }
+
+        function shareOnTwitter() {
+            const url = encodeURIComponent(window.location.href);
+            const title = encodeURIComponent('@Model.Title');
+            window.open(`https://twitter.com/intent/tweet?url=${url}&text=${title}`, '_blank', 'width=600,height=400');
+        }
+
+        function shareViaEmail() {
+            const url = encodeURIComponent(window.location.href);
+            const title = encodeURIComponent('@Model.Title');
+            const body = encodeURIComponent(`Tôi muốn chia sẻ bài viết này với bạn: ${window.location.href}`);
+            window.location.href = `mailto:?subject=${title}&body=${body}`;
+        }
+
+        // Smooth scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

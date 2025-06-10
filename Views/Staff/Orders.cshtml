@@ -1,0 +1,93 @@
+﻿@model List<Order>
+@{
+    ViewData["Title"] = "Quản lý đơn hàng";
+    Layout = "~/Views/Shared/DashboardLayout.cshtml";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4 text-primary text-center">
+        <i class="bi bi-bag-check-fill"></i> Quản lý đơn hàng
+    </h2>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="table-responsive">
+        <table class="table table-hover table-bordered align-middle shadow-sm">
+            <thead class="table-dark">
+                <tr class="text-center">
+                    <th>Khách hàng</th>
+                    <th>Điện thoại</th>
+                    <th>Địa chỉ</th>
+                    <th>Tổng</th>
+                    <th>Trạng thái</th>
+                    <th>Hành động</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var order in Model)
+                {
+                    <tr class="text-center">
+                        <td>@order.FullName</td>
+                        <td>@order.Phonenumber</td>
+                        <td class="text-start">@order.Address</td>
+                        <td class="text-end text-danger fw-bold">@order.Total.ToString("n0") đ</td>
+                        <td>
+                            @switch (order.Status)
+                            {
+                                case 0:
+                                    <span class="badge bg-warning text-dark">🕒 Đang xử lý</span>
+                                    ; break;
+                                case 1:
+                                    <span class="badge bg-success">✅ Hoàn tất</span>
+                                    ; break;
+                                case 2:
+                                    <span class="badge bg-danger">❌ Đã hủy</span>
+                                    ; break;
+                            }
+                        </td>
+                        <td>
+                            @if (order.Status == 0)
+                            {
+                                <form asp-action="UpdateOrderStatus" asp-controller="Staff" method="post" class="d-flex justify-content-center align-items-center gap-2">
+                                    <input type="hidden" name="id" value="@order.Id" />
+                                    <select name="status" class="form-select form-select-sm w-auto">
+                                        <option value="0" selected="@(order.Status == 0)">Đang xử lý</option>
+                                        <option value="1" selected="@(order.Status == 1)">Hoàn tất</option>
+                                        <option value="2" selected="@(order.Status == 2)">Đã hủy</option>
+                                    </select>
+                                    <button type="submit" class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-save"></i> Lưu
+                                    </button>
+                                    <a asp-action="ViewOrder" asp-controller="Staff" asp-route-id="@order.Id" class="btn btn-sm btn-outline-info">
+                                        <i class="bi bi-eye"></i> Xem
+                                    </a>
+                                </form>
+                            }
+                            else
+                            {
+                                <div class="d-flex justify-content-center align-items-center gap-2">
+                                    <span class="badge bg-secondary">Không thể chỉnh sửa</span>
+                                    <a asp-action="ViewOrder" asp-controller="Staff" asp-route-id="@order.Id" class="btn btn-sm btn-outline-info">
+                                        <i class="bi bi-eye"></i> Xem
+                                    </a>
+                                </div>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="mt-3">
+        <a href="/Dashboard/Index" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left-circle"></i> Quay lại trang chủ
+        </a>
+    </div>
+</div>

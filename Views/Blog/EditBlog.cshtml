@@ -1,0 +1,593 @@
+﻿@model EXE.Models.Blog
+@using EXE.Models
+@{
+    ViewData["Title"] = "Edit - " + Model.Title;
+    var regions = ViewBag.Regions as List<Region>;
+    var thumbnailPaths = !string.IsNullOrEmpty(Model.Thumbnail) ? Model.Thumbnail.Split(',') : new string[0];
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ckeditor/4.22.1/ckeditor.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        .thumbnail-item {
+            position: relative;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #f8f9fa;
+        }
+
+            .thumbnail-item img {
+                width: 100%;
+                height: 150px;
+                object-fit: cover;
+            }
+
+        .thumbnail-overlay {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: rgba(220, 53, 69, 0.9);
+            color: white;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .removed-thumbnail {
+            opacity: 0.5;
+            filter: grayscale(100%);
+        }
+
+        .file-input-container {
+            position: relative;
+        }
+
+        .file-input {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .file-input-label {
+            display: block;
+            padding: 40px 20px;
+            border: 2px dashed #dee2e6;
+            border-radius: 8px;
+            text-align: center;
+            color: #6c757d;
+            cursor: pointer;
+            background: #f8f9fa;
+            transition: all 0.3s ease;
+        }
+
+            .file-input-label:hover {
+                border-color: #667eea;
+                background: #e9ecef;
+            }
+
+        .blog-meta {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        .edit-form {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .action-buttons {
+            border-top: 1px solid #dee2e6;
+            padding-top: 20px;
+            margin-top: 30px;
+        }
+
+            .action-buttons .btn {
+                margin-right: 10px;
+                margin-bottom: 10px;
+            }
+    </style>
+</head>
+<body>
+    <!-- Header Section -->
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-10 mx-auto">
+                <div class="blog-meta">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <i class="fas fa-calendar-alt"></i>
+                            <strong>Created:</strong> @Model.CreatedAt.ToString("MMMM dd, yyyy")
+                        </div>
+                        <div class="col-md-4">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <strong>Current Region:</strong> @(Model.Region?.Name ?? "Unknown")
+                        </div>
+                        <div class="col-md-4">
+                            <i class="fas fa-user"></i>
+                            <strong>Author:</strong> @(Model.User?.UserName ?? "Anonymous")
+                        </div>
+                    </div>
+
+                    @if (Model.UpdatedAt.HasValue)
+                    {
+                        <div class="mt-2">
+                            <i class="fas fa-clock"></i>
+                            <strong>Last Updated:</strong> @Model.UpdatedAt.Value.ToString("MMMM dd, yyyy")
+                        </div>
+                    }
+
+                    <div class="mt-2">
+                        <i class="fas fa-star"></i>
+                        <strong>Current Rating:</strong> @Model.Star.ToString("0.0") stars
+                    </div>
+                </div>
+
+                <!-- Edit Form -->
+                <div class="edit-form">
+                    <form id="editForm">
+                        <input type="hidden" id="blogId" value="@Model.Id" />
+                        <input type="hidden" id="createdAt" value="@Model.CreatedAt" />
+                        <input type="hidden" id="userId" value="@Model.UserId" />
+                        <input type="hidden" id="removedThumbnails" value="" />
+
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="mb-3">
+                                    <label class="form-label">
+                                        <i class="fas fa-heading"></i> Blog Title *
+                                    </label>
+                                    <input id="title" name="title" class="form-control" placeholder="Enter blog title..." value="@Model.Title" required />
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label">
+                                        <i class="fas fa-map-marker-alt"></i> Region *
+                                    </label>
+                                    <select id="regionId" name="regionId" class="form-select" required>
+                                        <option value="">Select Region</option>
+                                        @if (regions != null)
+                                        {
+                                            @foreach (var region in regions)
+                                            {
+                                                <option value="@region.Id" selected="@(region.Id == Model.RegionId)">@region.Name</option>
+                                            }
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="mb-3">
+                                    <label class="form-label">
+                                        <i class="fas fa-link"></i> External Link
+                                    </label>
+                                    <input id="link" name="link" type="text" class="form-control" placeholder="https://example.com hoặc /Blog/Detail/123" value="@Model.Link" />
+                                    <div class="form-text">Tùy chọn: Thêm liên kết bên ngoài hoặc liên kết nội bộ</div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label">
+                                        <i class="fas fa-file-alt"></i> Content Type
+                                    </label>
+                                    <input id="contentType" name="contentType" type="text" class="form-control text-uppercase" placeholder="Nhập loại nội dung..." value="@Model.ContentType" oninput="this.value = this.value.toUpperCase()" />
+                                    <div class="form-text">Ví dụ: BÀI VIẾT, HƯỚNG DẪN, TIN TỨC, ĐÁNH GIÁ...</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">
+                                <i class="fas fa-tags"></i> Tags
+                            </label>
+                            <input id="tags" name="tags" class="form-control" placeholder="travel, food, culture, tips (separated by commas)" value="@Model.Tags" />
+                            <div class="form-text">Add relevant tags separated by commas to help categorize your blog</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">
+                                <i class="fas fa-align-left"></i> Short Content (Preview)
+                            </label>
+                            <textarea id="shortContent" name="shortContent" class="form-control" rows="3" placeholder="Brief description or excerpt...">@Model.ShortContent</textarea>
+                            <div class="form-text">This will be shown in blog listings and previews. If left empty, it will be auto-generated from your main content.</div>
+                        </div>
+
+                        <!-- Current Thumbnails -->
+                        @if (thumbnailPaths.Length > 0)
+                        {
+                            <div class="mb-4">
+                                <label class="form-label">
+                                    <i class="fas fa-images"></i> Current Images
+                                </label>
+                                <div class="row" id="currentThumbnails">
+                                    @for (int i = 0; i < thumbnailPaths.Length; i++)
+                                    {
+                                        var thumbnailPath = thumbnailPaths[i];
+                                        if (!string.IsNullOrWhiteSpace(thumbnailPath))
+                                        {
+                                            <div class="col-md-4 col-lg-3 mb-3" data-thumbnail="@thumbnailPath.Trim()">
+                                                <div class="thumbnail-item">
+                                                    <img src="@thumbnailPath.Trim()" alt="Current thumbnail" />
+                                                    <div class="thumbnail-overlay" onclick="removeThumbnail(this, '@thumbnailPath.Trim()')">
+                                                        <i class="fas fa-trash"></i>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
+                                    }
+                                </div>
+                                <div class="form-check mt-2">
+                                    <input class="form-check-input" type="checkbox" id="keepExisting" checked>
+                                    <label class="form-check-label" for="keepExisting">
+                                        Keep existing thumbnails when uploading new ones
+                                    </label>
+                                </div>
+                            </div>
+                        }
+
+                        <!-- New Thumbnails Upload -->
+                        <div class="mb-4">
+                            <label class="form-label">
+                                <i class="fas fa-upload"></i> Upload New Images
+                            </label>
+                            <div class="file-input-container">
+                                <label for="newThumbnails" class="file-input-label">
+                                    <i class="fas fa-cloud-upload-alt fa-2x mb-2"></i>
+                                    <div>Click to select images or drag and drop</div>
+                                    <small class="text-muted">Supports multiple files: JPG, PNG, GIF</small>
+                                </label>
+                                <input type="file"
+                                       name="newThumbnails"
+                                       id="newThumbnails"
+                                       class="file-input"
+                                       multiple
+                                       accept="image/*"
+                                       onchange="previewNewImages(this)" />
+                            </div>
+                            <div id="newImagePreview" class="row mt-3"></div>
+                        </div>
+
+                        <!-- Content Editor -->
+                        <div class="mb-4">
+                            <label class="form-label">
+                                <i class="fas fa-align-left"></i> Blog Content *
+                            </label>
+                            <textarea id="content" name="content" class="form-control" rows="10" required>@Model.Content</textarea>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="action-buttons">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-save"></i> Update Blog
+                            </button>
+                            <a href="@Url.Action("Detail", "Blog", new { id = Model.Id })" class="btn btn-secondary btn-lg">
+                                <i class="fas fa-times"></i> Cancel
+                            </a>
+                            
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <
+    <script>
+        let removedThumbnailsList = [];
+
+        // Initialize CKEditor
+        CKEDITOR.replace('content', {
+            height: 400,
+            filebrowserUploadUrl: '@Url.Action("UploadImage", "Blog")',
+            filebrowserUploadMethod: 'form',
+            toolbar: [
+                ['Bold', 'Italic', 'Underline', 'Strike', 'RemoveFormat'],
+                ['NumberedList', 'BulletedList', 'Outdent', 'Indent'],
+                ['JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'],
+                ['Link', 'Unlink', 'Image', 'Table'],
+                ['Styles', 'Format', 'Font', 'FontSize'],
+                ['TextColor', 'BGColor'],
+                ['Maximize', 'Source']
+            ]
+        });
+
+        // Remove thumbnail from current list
+        function removeThumbnail(element, thumbnailPath) {
+            Swal.fire({
+                title: 'Remove this image?',
+                text: 'This image will be removed from the blog.',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: '<i class="fas fa-trash"></i> Remove',
+                cancelButtonText: '<i class="fas fa-times"></i> Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Add to removed list
+                    removedThumbnailsList.push(thumbnailPath);
+                    document.getElementById('removedThumbnails').value = removedThumbnailsList.join(',');
+
+                    // Visual feedback
+                    const thumbnailContainer = element.closest('[data-thumbnail]');
+                    thumbnailContainer.classList.add('removed-thumbnail');
+
+                    // Change overlay to indicate removal
+                    element.innerHTML = '<i class="fas fa-undo"></i>';
+                    element.style.background = 'rgba(40, 167, 69, 0.9)';
+                    element.onclick = function() { restoreThumbnail(element, thumbnailPath); };
+
+                    Swal.fire({
+                        title: 'Removed!',
+                        text: 'Image marked for removal. Click the green button to restore.',
+                        icon: 'success',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                }
+            });
+        }
+
+        // Restore thumbnail
+        function restoreThumbnail(element, thumbnailPath) {
+            // Remove from removed list
+            removedThumbnailsList = removedThumbnailsList.filter(path => path !== thumbnailPath);
+            document.getElementById('removedThumbnails').value = removedThumbnailsList.join(',');
+
+            // Restore visual state
+            const thumbnailContainer = element.closest('[data-thumbnail]');
+            thumbnailContainer.classList.remove('removed-thumbnail');
+
+            // Reset overlay
+            element.innerHTML = '<i class="fas fa-trash"></i>';
+            element.style.background = 'rgba(220, 53, 69, 0.9)';
+            element.onclick = function() { removeThumbnail(element, thumbnailPath); };
+
+            Swal.fire({
+                title: 'Restored!',
+                text: 'Image has been restored.',
+                icon: 'success',
+                timer: 1500,
+                showConfirmButton: false
+            });
+        }
+
+        // Preview new images
+        function previewNewImages(input) {
+            const previewContainer = document.getElementById('newImagePreview');
+            previewContainer.innerHTML = '';
+
+            if (input.files) {
+                Array.from(input.files).forEach((file, index) => {
+                    if (file.type.startsWith('image/')) {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            const col = document.createElement('div');
+                            col.className = 'col-md-4 col-lg-3 mb-3';
+                            col.innerHTML = `
+                                <div class="thumbnail-item">
+                                    <img src="${e.target.result}" alt="New thumbnail" />
+                                    <div class="thumbnail-overlay bg-success" style="cursor: default;">
+                                        <i class="fas fa-plus"></i>
+                                    </div>
+                                </div>
+                            `;
+                            previewContainer.appendChild(col);
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+            }
+        }
+
+        // Auto-generate short content from main content
+        function generateShortContent() {
+            const content = CKEDITOR.instances.content.getData();
+            const plainText = content.replace(/<[^>]*>/g, ''); // Remove HTML tags
+            const shortContent = plainText.length > 150 ? plainText.substring(0, 150) + '...' : plainText;
+            document.getElementById('shortContent').value = shortContent;
+        }
+
+        // Form submission with AJAX and SweetAlert
+        document.getElementById('editForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const title = document.getElementById('title').value.trim();
+            const content = CKEDITOR.instances.content.getData().trim();
+            const regionId = document.getElementById('regionId').value;
+
+            if (!title) {
+                Swal.fire({
+                    title: 'Missing Title',
+                    text: 'Please enter a blog title.',
+                    icon: 'warning',
+                    confirmButtonText: 'OK'
+                });
+                return;
+            }
+
+            if (!content) {
+                Swal.fire({
+                    title: 'Missing Content',
+                    text: 'Please enter blog content.',
+                    icon: 'warning',
+                    confirmButtonText: 'OK'
+                });
+                return;
+            }
+
+            if (!regionId) {
+                Swal.fire({
+                    title: 'Missing Region',
+                    text: 'Please select a region.',
+                    icon: 'warning',
+                    confirmButtonText: 'OK'
+                });
+                return;
+            }
+
+            // Auto-generate short content if empty
+            const shortContent = document.getElementById('shortContent').value.trim();
+            if (!shortContent) {
+                generateShortContent();
+            }
+
+            // Show loading
+            Swal.fire({
+                title: 'Updating Blog...',
+                text: 'Please wait while we save your changes.',
+                icon: 'info',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            // Prepare form data
+            const formData = new FormData();
+            formData.append('Id', document.getElementById('blogId').value);
+            formData.append('Title', title);
+            formData.append('Content', content);
+            formData.append('ShortContent', document.getElementById('shortContent').value);
+            formData.append('ContentType', document.getElementById('contentType').value);
+            formData.append('Link', document.getElementById('link').value);
+        const tagsValue = document.getElementById('tags').value;
+        const formattedTags = tagsValue ? tagsValue
+            .split(',')
+            .map(tag => tag.trim())
+            .filter(tag => tag !== '')
+            .map(tag => tag.startsWith('#') ? tag : '#' + tag)
+            .join(' ') : '';
+        formData.append('Tags', formattedTags);            formData.append('RegionId', regionId);
+            formData.append('UserId', document.getElementById('userId').value);
+            formData.append('CreatedAt', document.getElementById('createdAt').value);
+            formData.append('keepExistingThumbnails', document.getElementById('keepExisting').checked);
+            formData.append('removedThumbnails', document.getElementById('removedThumbnails').value);
+
+            // Add new thumbnails
+            const newThumbnails = document.getElementById('newThumbnails').files;
+            for (let i = 0; i < newThumbnails.length; i++) {
+                formData.append('newThumbnails', newThumbnails[i]);
+            }
+
+            // Submit via AJAX
+            fetch('@Url.Action("EditBlog", "Blog")', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        title: 'Success!',
+                        text: data.message,
+                        icon: 'success',
+                        confirmButtonText: 'OK'
+                    }).then(() => {
+                        if (data.redirectUrl) {
+                            window.location.href = data.redirectUrl;
+                        }
+                    });
+                } else {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: data.message,
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'An unexpected error occurred. Please try again.',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+            });
+        });
+
+        // Drag and drop functionality
+        const fileInputLabel = document.querySelector('.file-input-label');
+
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            fileInputLabel.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            fileInputLabel.addEventListener(eventName, highlight, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            fileInputLabel.addEventListener(eventName, unhighlight, false);
+        });
+
+        function highlight(e) {
+            fileInputLabel.style.borderColor = '#667eea';
+            fileInputLabel.style.backgroundColor = '#e9ecef';
+        }
+
+        function unhighlight(e) {
+            fileInputLabel.style.borderColor = '#dee2e6';
+            fileInputLabel.style.backgroundColor = '#f8f9fa';
+        }
+
+        fileInputLabel.addEventListener('drop', handleDrop, false);
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            document.getElementById('newThumbnails').files = files;
+            previewNewImages(document.getElementById('newThumbnails'));
+        }
+
+        // Convert tags khi load trang
+        document.addEventListener('DOMContentLoaded', function() {
+            const tagsInput = document.getElementById('tags');
+            if (tagsInput && tagsInput.value) {
+                // Convert từ "#tag1 #tag2" thành "tag1, tag2"
+                const displayTags = tagsInput.value
+                    .split(' ')
+                    .map(tag => tag.trim())
+                    .filter(tag => tag !== '')
+                    .map(tag => tag.startsWith('#') ? tag.substring(1) : tag)
+                    .join(', ');
+                tagsInput.value = displayTags;
+            }
+        });
+    </script>
+</body>
+</html>

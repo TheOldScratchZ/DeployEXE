@@ -1,0 +1,328 @@
+.title-breadcrumb{
+    padding: 0px 160px 115px;
+    position: relative;
+    z-index: 3;
+    color: #fff;
+}
+
+.breadcrumb-stores{
+    background-image: url(../wp-content/uploads/2024/08/Banner.html);
+    background-position: 50% 50%;
+    background-repeat: no-repeat !important;
+    background-size: cover !important;
+    height: 560px;
+    display: flex;
+    align-items: end;
+    position: relative;
+    
+}
+
+.breadcrumb-stores:before{
+    content: "";
+    display: block;
+    width: 100%;
+    height: 100%;
+    background-color: rgb(9 8 5 / 50%);
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.title-breadcrumb h1{
+    font-size: 45px;
+}
+
+.title-breadcrumb .aioseo-breadcrumbs {
+    display: flex;
+    gap: 5px;
+    font-size: 17px;
+}
+
+.row-store h2{
+    width: 100%;
+    text-align: center;
+    color: #000;
+    margin-bottom: 30px;
+}
+
+.row-store{
+    margin-top: 30px;
+}
+
+.section-store{
+    display: flex;
+    gap: 10px;
+    width: 100%;
+}
+
+
+
+.fill{
+    height: 100%;
+    left: 0;
+    margin: 0 !important;
+    padding: 0 !important;
+    position: absolute;
+    right: 0;
+    top: 0;
+    background-color: rgb(0 0 0 / 6%);
+    transition: transform .3s, opacity .6s;
+}
+
+.section-store .col{
+    width: 50%;
+    padding-right: 0;
+}
+
+/* .map-col{
+    width: 70%;
+}
+
+.list-col{
+    width: 30%;
+} */
+
+#search_store_form{
+    display: flex;
+    gap: 10px;
+    padding: 20px;
+    background: #ECFFF3;
+}
+
+.col-province{
+    width: 33.33%;
+}
+
+#province_city{
+    width: 100%;
+    height: 35px;
+    border-radius: 5px;
+    padding: 0px 5px;
+}
+
+#district{
+    width: 100%;
+    height: 35px;
+    border-radius: 5px;
+    padding: 0px 5px;
+}
+
+#search_keyword{
+    width: 100%;
+    height: 36px;
+    border-radius: 5px;
+    border: 1px solid rgb(118, 118, 118);
+    padding: 0px 10px;
+}
+
+.col-province p{
+    margin-bottom: 5px;
+    font-size: 14px;
+    color: #605861;
+}
+
+.col-searchform{
+    display: flex;
+    align-items: end;
+}
+
+.store-list-all{
+    padding: 0px 20px 5px;
+    border-left: 1px solid;
+    border-right: 1px solid;
+    margin-top: 10px;
+    height: 440px;
+}
+
+.store-list-all ul{
+    list-style: none;
+}
+
+.store-title{
+    color: #1C8B44;
+    font-size: 18px;
+    text-transform: uppercase;
+}
+
+.store-address span{
+    color: #000;
+}
+
+.store-hotline span{
+    color: #000;
+}
+
+.store-address a{
+    display: flex;
+    gap: 5px;
+    align-items: center;
+}
+
+.store-hotline a{
+    display: flex;
+    gap: 5px;
+    align-items: center;
+}
+
+.store-item{
+    padding: 10px 0px 5px;
+    border-bottom: 1px solid;
+}
+
+.store-item:first-child{
+    padding-top: 2px;
+}
+
+.store-item:last-child{
+    border-bottom: 0px;
+}
+
+.map-col{
+    padding: 0;
+}
+
+.loader {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    animation: rotate 1s linear infinite;
+    position: absolute;
+    right: 50%;
+    top: 50%;
+    z-index: 2;
+}
+
+.loader::before {
+    content: "";
+    box-sizing: border-box;
+    position: absolute;
+    inset: 0px;
+    border-radius: 50%;
+    border: 10px solid #31a364;
+    animation: prixClipFix 2s linear infinite ;
+
+}
+
+.store-map iframe{
+    height: 550px!important;
+    width: 100%!important;
+}
+
+.store-map{
+    height: 440px
+}
+
+.slick-arrow.arrow.prev span{
+    position: absolute;
+    left: -40px;
+    top: 50%;
+    font-size: 35px;
+    color: #ECBC3E;
+    cursor: pointer;
+}
+
+.slick-arrow.arrow.next span{
+    position: absolute;
+    right: -40px;
+    top: 50%;
+    font-size: 35px;
+    color: #ECBC3E;
+    cursor: pointer;
+}
+
+.list-item .slick-dots{
+    margin-top:15px ;
+}
+
+/* .tab-content>.tab-pane{ 
+    display: block; height: 0px; overflow: hidden; 
+}
+.tab-content>.active{ 
+    height: auto;
+} */
+
+.containter-list-item{
+    position: relative;
+}
+
+.containter-list-item .fill{
+    background: #fff;
+}
+
+.containter-list-item .loader{
+    right: 45%;
+    top: 100px;
+}
+
+.containter-list-item .list-item {
+    opacity: 0;
+}
+
+.store-item h3{
+    margin-bottom: 10px;
+}
+
+.store-item h3:hover a{
+    color: red!important;
+}
+
+.store-item.active h3 .store-title{
+    color: red!important;
+    text-decoration: underline;
+}
+
+.info_contact .text-ct p{
+    margin-bottom: 0;
+}
+
+/* #section1 .banner-slider .content-banner{
+    left: 40%!important;
+} */
+
+@keyframes prixClipFix {
+    0%   {clip-path:polygon(50% 50%,0 0,0 0,0 0,0 0,0 0)}
+    25%  {clip-path:polygon(50% 50%,0 0,100% 0,100% 0,100% 0,100% 0)}
+    50%  {clip-path:polygon(50% 50%,0 0,100% 0,100% 100%,100% 100%,100% 100%)}
+    75%  {clip-path:polygon(50% 50%,0 0,100% 0,100% 100%,0 100%,0 100%)}
+    100% {clip-path:polygon(50% 50%,0 0,100% 0,100% 100%,0 100%,0 0)}
+}
+
+@keyframes rotate {
+    100%   {transform: rotate(360deg)}
+    }
+
+@media(max-width:575px){
+    .slick-arrow.arrow.next span{
+        right: -10px;
+    }
+
+    .slick-arrow.arrow.prev span{
+        left: -10px;
+    }
+
+    .list-item .slick-dots{
+       display: none!important;
+    }
+
+    .title-breadcrumb{
+        padding: 0px 35px 115px;
+    }
+
+    .section-store{
+        flex-wrap: wrap;
+        flex-direction: column-reverse;
+    }
+
+    .store-map{
+        height: unset;
+    }
+
+    .section-store .col{
+        width: 100%;
+        padding: 0px;
+    }
+    
+    .store-list-all{
+        margin-bottom: 10px;
+    }
+}

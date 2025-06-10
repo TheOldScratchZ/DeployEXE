@@ -1,0 +1,476 @@
+﻿@{
+    ViewData["Title"] = "Dashboard";
+    Layout = "~/Views/Shared/DashboardLayout.cshtml";
+}
+
+<style>
+    .stat-card {
+        transition: transform 0.2s;
+        cursor: pointer;
+    }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+        }
+
+    .chart-container {
+        margin-bottom: 30px;
+        background: white;
+        border-radius: 10px;
+        padding: 20px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .section-title {
+        color: #2c3e50;
+        font-weight: bold;
+        margin-bottom: 20px;
+        border-bottom: 3px solid #3498db;
+        padding-bottom: 10px;
+    }
+</style>
+
+<div class="container-fluid mt-4">
+    @if (ViewBag.IsAdmin)
+    {
+        <!-- Admin Dashboard -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <h2 class="section-title">🎯 Tổng quan Admin Dashboard</h2>
+            </div>
+        </div>
+
+        <!-- Stats Cards Row 1 -->
+        <div class="row mb-4">
+            <div class="col-xl-3 col-md-6">
+                <div class="card stat-card border-start border-success border-4 shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h6 class="card-title text-success">💰 Doanh thu hôm nay</h6>
+                                <h4 class="text-success">@String.Format("{0:N0}", ViewBag.TodayRevenue) VND</h4>
+                            </div>
+                            <div class="align-self-center">
+                                <i class="fas fa-calendar-day fa-2x text-success"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-md-6">
+                <div class="card stat-card border-start border-info border-4 shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h6 class="card-title text-info">📅 Doanh thu tuần này</h6>
+                                <h4 class="text-info">@String.Format("{0:N0}", ViewBag.WeeklyRevenue) VND</h4>
+                            </div>
+                            <div class="align-self-center">
+                                <i class="fas fa-calendar-week fa-2x text-info"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-md-6">
+                <a href="@Url.Action("Shop", "product")" class="text-decoration-none">
+
+                    <div class="card stat-card border-start border-primary border-4 shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h6 class="card-title text-primary">📦 Tổng sản phẩm</h6>
+                                    <h4 class="text-primary">@ViewBag.TotalProducts</h4>
+                                </div>
+                                <div class="align-self-center">
+                                    <i class="fas fa-boxes fa-2x text-primary"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </a>
+
+            </div>
+            <div class="col-xl-3 col-md-6">
+                <div class="card stat-card border-start border-warning border-4 shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h6 class="card-title text-warning">📊 Tổng tồn kho</h6>
+                                <h4 class="text-warning">@ViewBag.TotalStock</h4>
+                            </div>
+                            <div class="align-self-center">
+                                <i class="fas fa-warehouse fa-2x text-warning"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Cards Row 2 -->
+        <div class="row mb-4">
+            <div class="col-xl-3 col-md-6">
+                <a href="@Url.Action("Orders", "Staff")" class="text-decoration-none">
+                    <div class="card stat-card border-start border-secondary border-4 shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h6 class="card-title text-secondary">📋 Tổng đơn hàng</h6>
+                                    <h4 class="text-secondary">@ViewBag.TotalOrders</h4>
+                                </div>
+                                <div class="align-self-center">
+                                    <i class="fas fa-clipboard-list fa-2x text-secondary"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-xl-3 col-md-6">
+                <a href="@Url.Action("Orders", "Staff")" class="text-decoration-none">
+                    <div class="card stat-card border-start border-warning border-4 shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h6 class="card-title text-warning">🕒 Đơn chờ xử lý</h6>
+                                    <h4 class="text-warning">@ViewBag.PendingOrders</h4>
+                                </div>
+                                <div class="align-self-center">
+                                    <i class="fas fa-clock fa-2x text-warning"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-xl-3 col-md-6">
+                <a href="@Url.Action("Orders", "Staff")" class="text-decoration-none">
+                    <div class="card stat-card border-start border-success border-4 shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h6 class="card-title text-success">✅ Đơn hoàn thành</h6>
+                                    <h4 class="text-success">@ViewBag.CompletedOrders</h4>
+                                </div>
+                                <div class="align-self-center">
+                                    <i class="fas fa-check-circle fa-2x text-success"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-xl-3 col-md-6">
+                <a href="@Url.Action("Shop", "product")" class="text-decoration-none">
+                    <div class="card stat-card border-start border-danger border-4 shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h6 class="card-title text-danger">⚠️ Sản phẩm sắp hết</h6>
+                                    <h4 class="text-danger">@ViewBag.LowStockProducts</h4>
+                                    <small class="text-muted">(Dưới 10 sản phẩm)</small>
+                                </div>
+                                <div class="align-self-center">
+                                    <i class="fas fa-exclamation-triangle fa-2x text-danger"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="row mb-4">
+            <div class="col-lg-8">
+                <div class="chart-container">
+                    <h4 class="text-center mb-3">📊 Doanh thu 7 ngày gần nhất</h4>
+                    <canvas id="dailyRevenueChart" height="100"></canvas>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="chart-container">
+                    <h5 class="text-center mb-3">🏆 Top 5 sản phẩm bán chạy</h5>
+                    @if (ViewBag.TopProducts != null)
+                    {
+                        <div class="list-group">
+                            @foreach (var product in (IEnumerable<dynamic>)ViewBag.TopProducts)
+                            {
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span class="fw-bold">@product.ProductName</span>
+                                    <span class="badge bg-primary rounded-pill">@product.TotalSold</span>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Monthly Revenue Chart -->
+        @if (ViewBag.RevenueData != null)
+        {
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="chart-container">
+                        <h4 class="text-center mb-3">📈 Biểu đồ doanh thu theo tháng</h4>
+                        <canvas id="revenueChart" height="100"></canvas>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+
+    @if (ViewBag.IsStaff)
+    {
+        <!-- Staff Dashboard -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <h2 class="section-title">🧑‍💼 Dashboard Nhân viên</h2>
+            </div>
+        </div>
+
+        <!-- Revenue Stats for Staff -->
+        <div class="row mb-4">
+            <div class="col-xl-4 col-md-6">
+                <div class="card stat-card border-start border-success border-4 shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h6 class="card-title text-success">💰 Doanh thu hôm nay</h6>
+                                <h4 class="text-success">@String.Format("{0:N0}", ViewBag.TodayRevenue) VND</h4>
+                            </div>
+                            <div class="align-self-center">
+                                <i class="fas fa-calendar-day fa-2x text-success"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-4 col-md-6">
+                <div class="card stat-card border-start border-info border-4 shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h6 class="card-title text-info">📅 Doanh thu tuần này</h6>
+                                <h4 class="text-info">@String.Format("{0:N0}", ViewBag.WeeklyRevenue) VND</h4>
+                            </div>
+                            <div class="align-self-center">
+                                <i class="fas fa-calendar-week fa-2x text-info"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Daily Revenue Chart for Staff -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="chart-container">
+                    <h4 class="text-center mb-3">📊 Doanh thu 7 ngày gần nhất</h4>
+                    <canvas id="staffDailyRevenueChart" height="100"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Basic Stats for Staff -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <a href="@Url.Action("Index", "Blog")" class="text-decoration-none">
+                    <div class="card stat-card shadow-sm border-start border-primary border-4">
+                        <div class="card-body">
+                            <h5 class="card-title">📚 Bài viết</h5>
+                            <h3>@ViewBag.BlogCount</h3>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-3">
+                <a href="@Url.Action("Shop", "product")" class="text-decoration-none">
+                    <div class="card stat-card shadow-sm border-start border-success border-4">
+                        <div class="card-body">
+                            <h5 class="card-title">📦 Sản phẩm</h5>
+                            <h3>@ViewBag.ProductCount</h3>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-3">
+                <a href="@Url.Action("Orders", "Staff", new { status = 0 })" class="text-decoration-none">
+                    <div class="card stat-card shadow-sm border-start border-warning border-4">
+                        <div class="card-body">
+                            <h5 class="card-title">🕒 Đơn đang xử lý</h5>
+                            <h3>@ViewBag.OrderPending</h3>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-3">
+                <a href="@Url.Action("Orders", "Staff", new { status = 1 })" class="text-decoration-none">
+                    <div class="card stat-card shadow-sm border-start border-danger border-4">
+                        <div class="card-body">
+                            <h5 class="card-title">✅ Đơn hoàn tất</h5>
+                            <h3>@ViewBag.OrderCompleted</h3>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    }
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://kit.fontawesome.com/your-fontawesome-kit.js"></script>
+
+<script>
+    // Admin Charts
+    @if (ViewBag.IsAdmin)
+    {
+        // Daily Revenue Chart for Admin
+        @if (ViewBag.DailyRevenue != null)
+        {
+            <text>
+                                                                                            const dailyLabels = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(
+                ((IEnumerable<dynamic>)ViewBag.DailyRevenue).Select(r => r.Date.ToString("dd/MM"))
+            ));
+                                                                                            const dailyData = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(
+                ((IEnumerable<dynamic>)ViewBag.DailyRevenue).Select(r => r.Total)
+            ));
+
+                                                                                            const dailyCtx = document.getElementById('dailyRevenueChart').getContext('2d');
+                                                                                            new Chart(dailyCtx, {
+                                                                                                type: 'line',
+                                                                                                data: {
+                                                                                                    labels: dailyLabels,
+                                                                                                    datasets: [{
+                                                                                                        label: 'Doanh thu (VND)',
+                                                                                                        data: dailyData,
+                                                                                                        borderColor: 'rgba(75, 192, 192, 1)',
+                                                                                                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                                                                                                        tension: 0.4,
+                                                                                                        fill: true
+                                                                                                    }]
+                                                                                                },
+                                                                                                options: {
+                                                                                                    responsive: true,
+                                                                                                    plugins: {
+                                                                                                        legend: {
+                                                                                                            display: true
+                                                                                                        }
+                                                                                                    },
+                                                                                                    scales: {
+                                                                                                        y: {
+                                                                                                            beginAtZero: true,
+                                                                                                            ticks: {
+                                                                                                                callback: function(value) {
+                                                                                                                    return value.toLocaleString() + ' VND';
+                                                                                                                }
+                                                                                                            }
+                                                                                                        }
+                                                                                                    }
+                                                                                                }
+                                                                                            });
+            </text>
+        }
+
+        // Monthly Revenue Chart for Admin
+        @if (ViewBag.RevenueData != null)
+        {
+            <text>
+                                                                                            const monthlyLabels = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(
+                ((IEnumerable<dynamic>)ViewBag.RevenueData).Select(r => "Tháng " + r.Month + "/" + r.Year)
+            ));
+                                                                                            const monthlyData = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(
+                ((IEnumerable<dynamic>)ViewBag.RevenueData).Select(r => r.Total)
+            ));
+
+                                                                                            const monthlyCtx = document.getElementById('revenueChart').getContext('2d');
+                                                                                            new Chart(monthlyCtx, {
+                                                                                                type: 'bar',
+                                                                                                data: {
+                                                                                                    labels: monthlyLabels,
+                                                                                                    datasets: [{
+                                                                                                        label: 'Doanh thu (VND)',
+                                                                                                        data: monthlyData,
+                                                                                                        backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                                                                                                        borderColor: 'rgba(54, 162, 235, 1)',
+                                                                                                        borderWidth: 1
+                                                                                                    }]
+                                                                                                },
+                                                                                                options: {
+                                                                                                    responsive: true,
+                                                                                                    plugins: {
+                                                                                                        legend: {
+                                                                                                            display: true
+                                                                                                        }
+                                                                                                    },
+                                                                                                    scales: {
+                                                                                                        y: {
+                                                                                                            beginAtZero: true,
+                                                                                                            ticks: {
+                                                                                                                callback: function(value) {
+                                                                                                                    return value.toLocaleString() + ' VND';
+                                                                                                                }
+                                                                                                            }
+                                                                                                        }
+                                                                                                    }
+                                                                                                }
+                                                                                            });
+            </text>
+        }
+    }
+
+    // Staff Charts
+    @if (ViewBag.IsStaff)
+    {
+        // Daily Revenue Chart for Staff
+        @if (ViewBag.DailyRevenue != null)
+        {
+            <text>
+                                                                                            const staffDailyLabels = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(
+                ((IEnumerable<dynamic>)ViewBag.DailyRevenue).Select(r => r.Date.ToString("dd/MM"))
+            ));
+                                                                                            const staffDailyData = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(
+                ((IEnumerable<dynamic>)ViewBag.DailyRevenue).Select(r => r.Total)
+            ));
+
+                                                                                            const staffDailyCtx = document.getElementById('staffDailyRevenueChart').getContext('2d');
+                                                                                            new Chart(staffDailyCtx, {
+                                                                                                type: 'line',
+                                                                                                data: {
+                                                                                                    labels: staffDailyLabels,
+                                                                                                    datasets: [{
+                                                                                                        label: 'Doanh thu (VND)',
+                                                                                                        data: staffDailyData,
+                                                                                                        borderColor: 'rgba(255, 99, 132, 1)',
+                                                                                                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                                                                                                        tension: 0.4,
+                                                                                                        fill: true
+                                                                                                    }]
+                                                                                                },
+                                                                                                options: {
+                                                                                                    responsive: true,
+                                                                                                    plugins: {
+                                                                                                        legend: {
+                                                                                                            display: true
+                                                                                                        }
+                                                                                                    },
+                                                                                                    scales: {
+                                                                                                        y: {
+                                                                                                            beginAtZero: true,
+                                                                                                            ticks: {
+                                                                                                                callback: function(value) {
+                                                                                                                    return value.toLocaleString() + ' VND';
+                                                                                                                }
+                                                                                                            }
+                                                                                                        }
+                                                                                                    }
+                                                                                                }
+                                                                                            });
+            </text>
+        }
+    }
+</script>

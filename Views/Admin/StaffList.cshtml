@@ -1,0 +1,64 @@
+﻿@using Microsoft.AspNetCore.Identity
+@model List<ApplicationUser>
+
+@{
+    ViewData["Title"] = "Quản lý nhân viên";
+    Layout = "~/Views/Shared/DashboardLayout.cshtml";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4 text-center">👨‍💼 Danh sách nhân viên (Staff)</h2>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
+
+    <!-- Form thêm tài khoản -->
+    <form asp-action="CreateStaff" method="post" class="row g-3 align-items-center mb-4">
+        <div class="col-auto">
+            <label for="email" class="col-form-label">Nhập Email nhân viên:</label>
+        </div>
+        <div class="col-auto">
+            <input type="email" name="email" class="form-control" required placeholder="staff@email.com" />
+        </div>
+        <div class="col-auto">
+            <button type="submit" class="btn btn-primary">➕ Thêm tài khoản</button>
+        </div>
+    </form>
+
+    <!-- Danh sách nhân viên -->
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info text-center">Chưa có nhân viên nào được tạo.</div>
+    }
+    else
+    {
+        <table class="table table-bordered shadow-sm">
+            <thead class="table-light">
+                <tr>
+                    <th>Họ</th>
+                    <th>Tên</th>
+                    <th>Email</th>
+                    <th>Số điện thoại</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var staff in Model)
+                {
+                    <tr>
+                        <td>@staff.FirstName</td>
+                        <td>@staff.LastName</td>
+                        <td>@staff.Email</td>
+                        <td>@staff.PhoneNumber</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    <a href="/Dashboard/Index" class="btn btn-outline-secondary px-4">Quay lại</a>
+</div>

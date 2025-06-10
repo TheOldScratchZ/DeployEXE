@@ -1,0 +1,114 @@
+﻿@using System.Linq
+
+@{
+    Layout = "~/Views/Shared/ProductLayout.cshtml";
+}
+@Html.Partial("~/Views/chatbox.cshtml")
+
+<div class="container my-5">
+    <h2 class="mb-4 text-center">Hoàn tất đặt hàng </h2>
+    <div class="row">
+        <div class="col-6">
+            <div class="shadow rounded">
+                <h5 class="ms-2 text-primary" style="margin-bottom: 60px;">Thông tin khách hàng </h5>
+
+                <form asp-action="CreateOrder" asp-controller="Order" method="post" class="form-card p-2">
+                    <div class="row justify-content-between text-left">
+                        <div class="form-group col-sm-6 flex-column d-flex mb-3">
+                            <label class="form-control-label px-3">
+                                Họ và tên <span class="text-danger">*</span>
+                            </label>
+                            <input class="form-control" value="@(ViewBag.fullname ?? "")" type="text" id="fullname" name="fullname"
+                                   placeholder="Điền họ tên người nhận " onblur="validate(1)">
+                            @if (!(ViewBag.IsCorrectName ?? true))
+                            {
+                                <small class="text-danger fs-6">Tên khách hàng không được để trống</small>
+                            }
+                        </div>
+                        <div class="form-group col-sm-6 flex-column d-flex mb-3">
+                            <label class="form-control-label px-3">
+                                Số điện thoại <span class="text-danger">*</span>
+                            </label>
+                            <input value="@(ViewBag.phone ?? "")" class="form-control" type="text" id="phone" name="phone" placeholder="Số điện thoại"
+                                   onblur="validate(2)">
+                            @if (!(ViewBag.IsCorrectPhone ?? true))
+                            {
+                                <small class="text-danger fs-6">SDT không hợp lệ</small>
+                            }
+                        </div>
+                    </div>
+                    <div class="row justify-content-between text-left">
+                        <div class="form-group col-sm-12 flex-column d-flex mb-3">
+                            <label class="form-control-label px-3">
+                                Địa chỉ <span class="text-danger">*</span>
+                            </label>
+                            <input class="form-control" type="text" id="address" value="@(ViewBag.address ?? "")" name="address"
+                                   placeholder="Điền địa chỉ chi tiết " onblur="validate(3)">
+                            @if (!(ViewBag.IsCorrectAddress ?? true))
+                            {
+                                <small class="text-danger fs-6">Địa chỉ không hợp lệ</small>
+                            }
+                        </div>
+                        <div class="form-group col-sm-8 flex-column d-flex mb-3">
+                            <label class="form-control-label px-3">Lưu ý khi giao hàng</label>
+                            <textarea rows="5" class="form-control" id="mob" name="note" onblur="validate(4)">@(ViewBag.note ?? "")</textarea>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-center">
+                        <div class="form-group mt-3">
+                            <button type="submit" class="btn btn-block btn-primary mb-3">Đặt hàng</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="col-6">
+            <div class="table-responsive table table-triped shadow rounded" style="max-height: 500px;">
+                <h5 class="ms-2 text-primary">Đơn hàng của bạn</h5>
+                <table class="table align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="text-secondary" style="width: 120px;">Ảnh</th>
+                            <th class="text-secondary">Sản phẩm</th>
+                            <th class="text-center text-secondary">Số lượng</th>
+                            <th class="text-end text-secondary">Giá</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (ViewBag.Cart != null && ViewBag.Cart.CartItems != null && ViewBag.Cart.CartItems.Count > 0)
+                        {
+                            foreach (var item in ViewBag.Cart.CartItems)
+                            {
+                                var imageList = item.Product?.ImageUrl as List<string>;
+                                var firstImage = (imageList != null && imageList.Any()) ? imageList.First() : "";
+
+                                <tr>
+                                    <td>
+                                        <img src="@firstImage" alt="@item.Product?.Name" class="img-fluid rounded" style="height: 100px; object-fit: cover;" />
+                                    </td>
+                                    <td>
+                                        <div class="fw-semibold">@item.Product?.Name</div>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="mx-2">@item.Quantity</span>
+                                    </td>
+                                    <td class="text-end text-success fw-bold">@item.Price.ToString("N0") đ</td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="4" class="text-center">Giỏ hàng trống</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+                <h6 class="ms-2 text-primary">
+                    Tổng cộng: <span class="fw-bold">@ViewBag.Cart.TotalPrice.ToString("n0") đ</span>
+                </h6>
+            </div>
+        </div>
+    </div>
+</div>

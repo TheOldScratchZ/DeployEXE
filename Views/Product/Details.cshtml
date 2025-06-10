@@ -1,0 +1,86 @@
+﻿@{
+
+}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+@model EXE.Models.Product
+@{
+    Layout = (User.IsInRole("Admin") || User.IsInRole("Staff"))
+    ? "~/Views/Shared/DashboardLayout.cshtml"
+    : "~/Views/Pages/Shared/ProductLayout.cshtml";
+}
+@Html.Partial("~/Views/chatbox.cshtml")
+
+<h2 class="text-center mb-4">Chi tiết sản phẩm</h2>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="row g-4">
+                <!-- Image gallery -->
+                <div class="col-md-5">
+                    <div class="mb-3">
+                        <img src="@Model.ImageUrl.FirstOrDefault()" class="img-fluid rounded w-100" style="max-height: 400px; object-fit: cover;" alt="@Model.Name" />
+                    </div>
+
+                    @if (Model.ImageUrl.Count > 1)
+                    {
+                        <div class="d-flex gap-2 flex-wrap">
+                            @foreach (var img in Model.ImageUrl.Skip(1))
+                            {
+                                <img src="@img" class="img-thumbnail" style="width: 80px; height: 80px; object-fit: cover;" alt="@Model.Name" />
+                            }
+                        </div>
+                    }
+                </div>
+
+                <!-- Product info -->
+                <div class="col-md-7">
+                    <h2 class="mb-2">@Model.Name</h2>
+                    <p class="text-muted">Vùng sản xuất: @Model.Region?.Name</p>
+
+                    <h4 class="text-success fw-bold">@Model.Price.ToString("N0") VNĐ</h4>
+                    <p>Còn lại: <strong>@Model.Stock</strong> sản phẩm</p>
+
+                    <span class="fw-medium d-block">Mô tả:</span>
+                    <p>@Model.Description</p>
+
+                    <div class="mt-4 d-flex flex-wrap gap-3">
+                        @if(!User.IsInRole("Admin") && !User.IsInRole("Staff"))
+                        {
+                            <form asp-controller="Cart" asp-action="AddToCart" method="post" class="mt-auto">
+                                <input type="hidden" name="productId" value="@Model.Id" />
+                                <div class="input-group input-group-sm">
+                                    <input type="number" name="quantity" value="1" min="1" class="form-control text-center" style="max-width: 60px;" />
+                                    <button type="submit" class="btn btn-primary">Thêm vào giỏ</button>
+                                </div>
+                            </form>
+                            <a href="/product/shop" class="btn btn-outline-secondary px-4">Quay lại</a>
+                        }
+
+                        @if (User.IsInRole("Admin") || User.IsInRole("Staff"))
+                        {
+                            <!-- Nút Chỉnh sửa -->
+                            <a href="/product/edit/@Model.Id" class="btn btn-warning px-4">Chỉnh sửa</a>
+
+                            <!-- Nút Xóa -->
+                            <form asp-action="Delete" asp-controller="Product" asp-route-id="@Model.Id" method="post" onsubmit="return confirm('Bạn có chắc muốn xóa sản phẩm này?')">
+                                <button type="submit" class="btn btn-danger px-4">Xóa</button>
+                            </form>
+                            <a href="/Product/Shop" class="btn btn-outline-secondary px-4">Quay lại</a>
+                        }
+                    </div>
+
+                    @* <div class="mt-4"> *@
+                    @*     <small class="text-muted"> *@
+                    @*         Ngày tạo: @Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")<br /> *@
+                    @*         @if (Model.UpdatedAt.HasValue) *@
+                    @*         { *@
+                    @*             <span>Cập nhật: @Model.UpdatedAt.Value.ToString("dd/MM/yyyy HH:mm")</span> *@
+                    @*         } *@
+                    @*     </small> *@
+                    @* </div> *@
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
